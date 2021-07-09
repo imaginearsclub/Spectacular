@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import network.palace.audio.Audio;
 import network.palace.audio.handlers.AudioArea;
-import network.palace.core.Core;
-import network.palace.core.player.CPlayer;
-import network.palace.core.player.Rank;
-import network.palace.core.utils.HeadUtil;
 import network.palace.show.actions.*;
 import network.palace.show.actions.armor.*;
 import network.palace.show.actions.audio.AudioStart;
@@ -23,6 +19,7 @@ import network.palace.show.sequence.fountain.FountainSequence;
 import network.palace.show.sequence.laser.LaserSequence;
 import network.palace.show.sequence.light.LightSequence;
 import network.palace.show.sequence.particle.ParticleSequence;
+import network.palace.show.utils.HeadUtil;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.*;
@@ -494,12 +491,12 @@ public class Show {
     public boolean update() {
         if (!invalidLines.isEmpty()) return true;
 
-        CPlayer[] nearPlayers;
+        Player[] nearPlayers;
         List<UUID> nearIDs = getNearPlayers();
-        nearPlayers = new CPlayer[nearIDs.size()];
+        nearPlayers = new Player[nearIDs.size()];
         int i = 0;
         for (UUID uuid : nearIDs) {
-            nearPlayers[i++] = Core.getPlayerManager().getPlayer(uuid);
+            nearPlayers[i++] = Bukkit.getPlayer(uuid);
         }
 
         long timeDiff = getShowTime();
@@ -571,7 +568,7 @@ public class Show {
         return location.clone();
     }
 
-    public void syncAudioForPlayer(final CPlayer tp) {
+    public void syncAudioForPlayer(final Player tp) {
         final AudioArea area = Audio.getInstance().getByName(areaName);
         if (area == null) {
             return;
@@ -599,10 +596,11 @@ public class Show {
             }
         }
         if (debug > 0) {
-            Core.getPlayerManager().getOnlinePlayers().stream()
-                    .filter(p -> p.getRank().getRankId() >= Rank.TRAINEETECH.getRankId())
-                    .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + getName() + "] " +
-                            ChatColor.YELLOW + debug + " debug messages were hidden."));
+//            Bukkit.getOnlinePlayers()
+//            Bukkit.getOnlinePlayers().stream()
+//                    .filter(p -> p.hasPermission() >= Rank.TRAINEETECH.getRankId())
+//                    .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + getName() + "] " +
+//                            ChatColor.YELLOW + debug + " debug messages were hidden."));
         }
     }
 

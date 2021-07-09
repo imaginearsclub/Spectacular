@@ -2,11 +2,6 @@ package network.palace.show;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import lombok.Getter;
-import network.palace.core.Core;
-import network.palace.core.player.CPlayer;
-import network.palace.core.player.Rank;
-import network.palace.core.plugin.Plugin;
-import network.palace.core.plugin.PluginInfo;
 import network.palace.show.commands.*;
 import network.palace.show.generator.ShowGenerator;
 import network.palace.show.listeners.ChunkListener;
@@ -17,15 +12,17 @@ import network.palace.show.utils.BuildUtil;
 import network.palace.show.utils.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Marc on 12/6/16.
+ * Updated to be Core free by Tom 07/10/2021
  */
-@PluginInfo(name = "Show", version = "1.5.4", depend = {"Audio", "Core"}, softdepend = "WorldEdit", canReload = true)
-public class ShowPlugin extends Plugin {
+public class ShowPlugin extends JavaPlugin {
     @Getter private ArmorStandManager armorStandManager;
     @Getter private FountainManager fountainManager;
     @Getter private static ShowGenerator showGenerator;
@@ -39,7 +36,7 @@ public class ShowPlugin extends Plugin {
     }
 
     @Override
-    protected void onPluginEnable() throws Exception {
+    public void onEnable() {
         instance = this;
         armorStandManager = new ArmorStandManager();
         fountainManager = new FountainManager();
@@ -51,6 +48,7 @@ public class ShowPlugin extends Plugin {
         registerCommand(new ShowBuildCommand());
         registerCommand(new ShowGenCommand());
         registerCommand(new ShowDebugCommand());
+
         registerListener(fountainManager);
         registerListener(new PlayerInteract());
         registerListener(new SignChange());
@@ -69,11 +67,11 @@ public class ShowPlugin extends Plugin {
     }
 
     @Override
-    protected void onPluginDisable() throws Exception {
+    public void onDisable() {
         ProtocolLibrary.getProtocolManager().removePacketListeners(this);
         int size = shows.size();
         if (size > 0) {
-            for (CPlayer p : Core.getPlayerManager().getOnlinePlayers()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.getRank().getRankId() >= Rank.TRAINEE.getRankId()) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Reloading Show plugin, there are currently " +
                             size + " shows running!");
