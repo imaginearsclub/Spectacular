@@ -1,13 +1,13 @@
 package network.palace.show.handlers.particle;
 
 import lombok.Getter;
-import network.palace.core.Core;
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.handlers.ParticleObject;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -75,9 +75,9 @@ public class CylinderParticle extends ParticleObject {
             double z = (Math.cos(startingDistance) * radius) + loc.getZ();
 
             for (UUID uuid : show.getNearPlayers()) {
-                CPlayer tp = Core.getPlayerManager().getPlayer(uuid);
+                Player tp = Bukkit.getPlayer(uuid);
                 if (tp == null) continue;
-                tp.getParticles().send(new Location(tp.getWorld(), x, loc.getY(), z), particle, count, offsetX, offsetY, offsetZ, speed);
+                tp.spawnParticle(particle, new Location(tp.getWorld(), x, loc.getY(), z), count, offsetX, offsetY, offsetZ, speed);
             }
 
             startingDistance += distance;

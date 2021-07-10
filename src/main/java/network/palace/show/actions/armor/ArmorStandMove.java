@@ -1,6 +1,5 @@
 package network.palace.show.actions.armor;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
 import network.palace.show.actions.ShowAction;
@@ -10,6 +9,7 @@ import network.palace.show.handlers.armorstand.ShowStand;
 import network.palace.show.handlers.armorstand.StandAction;
 import network.palace.show.utils.ShowUtil;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 /**
@@ -28,7 +28,7 @@ public class ArmorStandMove extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         if (!stand.isHasSpawned()) {
             ShowUtil.logDebug(show.getName(), "ArmorStand with ID " + stand.getId() + " has not spawned");
             return;

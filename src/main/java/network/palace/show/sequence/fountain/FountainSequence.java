@@ -1,13 +1,13 @@
 package network.palace.show.sequence.fountain;
 
 import lombok.Getter;
-import network.palace.core.Core;
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.sequence.ShowSequence;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.FallingBlock;
@@ -109,7 +109,7 @@ public class FountainSequence extends ShowSequence {
                                 data = new MaterialData(Material.getMaterial(Integer.parseInt(list[0])), Byte.parseByte(list[1]));
                             }
                         } catch (Exception e) {
-                            Core.logMessage("Show Parser", "Error parsing id:data for " + args[2]);
+                           Bukkit.getLogger().info("Show Parser " + " Error parsing id:data for " + args[2]);
                             data = new MaterialData(Material.GLASS);
                         }
                         continue;

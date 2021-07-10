@@ -1,12 +1,12 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Marc on 1/10/15
@@ -36,11 +36,11 @@ public class ParticleAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         if (effect == null) return;
-        for (CPlayer tp : nearPlayers) {
+        for (Player tp : nearPlayers) {
             if (tp == null) continue;
-            tp.getParticles().send(loc, effect, amount, (float) offsetX, (float) offsetY, (float) offsetZ, speed);
+            tp.spawnParticle(effect, loc, amount, (float) offsetX, (float) offsetY, (float) offsetZ, speed);
         }
     }
 

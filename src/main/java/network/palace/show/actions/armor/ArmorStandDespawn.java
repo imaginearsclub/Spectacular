@@ -1,12 +1,12 @@
 package network.palace.show.actions.armor;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.actions.ShowAction;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.handlers.armorstand.ShowStand;
 import network.palace.show.utils.ShowUtil;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Marc on 10/11/15
@@ -20,7 +20,7 @@ public class ArmorStandDespawn extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         if (!stand.isHasSpawned()) {
             ShowUtil.logDebug(show.getName(), "ArmorStand with ID " + stand.getId() + " has not spawned");
             return;

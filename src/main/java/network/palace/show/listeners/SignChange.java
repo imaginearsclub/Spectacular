@@ -12,19 +12,19 @@ import org.bukkit.event.block.SignChangeEvent;
  */
 public class SignChange implements Listener {
 
-    @EventHandler
-    public void onSignChange(SignChangeEvent event) {
-        Player player = event.getPlayer();
-        Block b = event.getBlock();
-        if (b.getType().equals(Material.SIGN) || b.getType().equals(Material.SIGN_POST) ||
-                b.getType().equals(Material.WALL_SIGN)) {
-            String l1 = event.getLine(0);
-            if (l1.equalsIgnoreCase("[show]")) {
-                event.setLine(0, PlayerInteract.show);
-                event.setLine(3, event.getLine(1));
-                event.setLine(1, "Click to sync");
-                event.setLine(2, "your music to");
-            }
-        }
-    }
+//    @EventHandler
+//    public void onSignChange(SignChangeEvent event) {
+//        Player player = event.getPlayer();
+//        Block b = event.getBlock();
+//        if (b.getType().equals(Material.SIGN) || b.getType().equals(Material.SIGN_POST) ||
+//                b.getType().equals(Material.WALL_SIGN)) {
+//            String l1 = event.getLine(0);
+//            if (l1.equalsIgnoreCase("[show]")) {
+//                event.setLine(0, PlayerInteract.show);
+//                event.setLine(3, event.getLine(1));
+//                event.setLine(1, "Click to sync");
+//                event.setLine(2, "your music to");
+//            }
+//        }
+//    }
 }

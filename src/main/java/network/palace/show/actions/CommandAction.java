@@ -1,9 +1,9 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class CommandAction extends ShowAction {
     private String command;
@@ -18,7 +18,7 @@ public class CommandAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 

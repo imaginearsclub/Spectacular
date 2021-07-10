@@ -1,13 +1,14 @@
 package network.palace.show.actions;
 
-import network.palace.core.Core;
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
+import network.palace.show.ShowPlugin;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Player;
 
 public class SpiralParticle extends ShowAction {
     private Particle effect;
@@ -26,8 +27,8 @@ public class SpiralParticle extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
-        int taskID = Core.runTaskTimer(() -> {
+    public void play(Player[] nearPlayers) {
+        int taskID = Bukkit.getScheduler().runTaskTimer(ShowPlugin.getInstance(), () -> {
             for (int i = 1; i <= strands; i++) {
                 for (int j = 1; j <= particles; j++) {
                     float ratio = (float) j / particles;
@@ -43,19 +44,18 @@ public class SpiralParticle extends ShowAction {
 
                     loc.add(x, vertical, z);
 
-                    for (CPlayer tp : nearPlayers) {
+                    for (Player tp : nearPlayers) {
                         if (tp == null || !tp.getWorld().getUID().equals(loc.getWorld().getUID()) || tp.getLocation().distance(loc) > 50)
                             continue;
-
-                        tp.getParticles().send(loc, effect, 1, 0, 0, 0, 0);
+                        tp.spawnParticle(effect, loc, 1, 0, 0, 0, 0);
                     }
 
                     loc.subtract(x, vertical, z);
                 }
             }
             step += speed;
-        }, 0L, 1L);
-        Core.runTaskLater(() -> Core.cancelTask(taskID), duration * 20L);
+        }, 0L, 1L).getTaskId();
+        Bukkit.getScheduler().runTaskLater(ShowPlugin.getInstance(), () -> Bukkit.getScheduler().cancelTask(taskID), duration * 20L);
     }
 
     @Override

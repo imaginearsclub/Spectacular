@@ -1,6 +1,5 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
 import network.palace.show.exceptions.ShowParseException;
@@ -9,6 +8,7 @@ import network.palace.show.handlers.Fountain;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class FountainAction extends ShowAction {
@@ -32,7 +32,7 @@ public class FountainAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         ShowPlugin.getInstance().getFountainManager().addFountain(new Fountain(loc, duration, type, data, force));
     }
 

@@ -1,8 +1,8 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
+import org.bukkit.entity.Player;
 
 public class MusicAction extends ShowAction {
     private int record;
@@ -17,7 +17,7 @@ public class MusicAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         show.playMusic(record);
     }
 

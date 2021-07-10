@@ -1,13 +1,14 @@
 package network.palace.show;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.utility.MinecraftVersion;
 import lombok.Getter;
 import network.palace.show.commands.*;
 import network.palace.show.generator.ShowGenerator;
 import network.palace.show.listeners.ChunkListener;
 import network.palace.show.listeners.PlayerInteract;
 import network.palace.show.listeners.SignChange;
-import network.palace.show.packets.PacketListener;
+import network.palace.show.npc.SoftNPCManager;
 import network.palace.show.utils.BuildUtil;
 import network.palace.show.utils.FileUtil;
 import org.bukkit.Bukkit;
@@ -27,6 +28,8 @@ public class ShowPlugin extends JavaPlugin {
     @Getter private FountainManager fountainManager;
     @Getter private static ShowGenerator showGenerator;
     @Getter private static BuildUtil buildUtil;
+    @Getter private static SoftNPCManager softNPCManager;
+    @Getter private final boolean isMinecraftGreaterOrEqualTo11_2 = MinecraftVersion.getCurrentVersion().getMinor() >= 12;
     private static ShowPlugin instance;
     private static final HashMap<String, Show> shows = new HashMap<>();
     private int taskid = 0;
@@ -42,8 +45,8 @@ public class ShowPlugin extends JavaPlugin {
         fountainManager = new FountainManager();
         showGenerator = new ShowGenerator();
         buildUtil = new BuildUtil();
+        softNPCManager = new SoftNPCManager();
         FileUtil.setupFiles();
-        registerCommand(new MultiShowCommand());
         registerCommand(new ShowCommand());
         registerCommand(new ShowBuildCommand());
         registerCommand(new ShowGenCommand());
@@ -53,7 +56,6 @@ public class ShowPlugin extends JavaPlugin {
         registerListener(new PlayerInteract());
         registerListener(new SignChange());
         registerListener(new ChunkListener());
-        registerListener(new PacketListener());
         // Show Ticker
         taskid = Bukkit.getScheduler().runTaskTimer(this, () -> {
             for (Map.Entry<String, Show> entry : new HashMap<>(shows).entrySet()) {

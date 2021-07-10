@@ -1,6 +1,5 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.handlers.BlockData;
@@ -8,6 +7,7 @@ import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 public class BlockAction extends ShowAction {
     public Location location;
@@ -27,7 +27,7 @@ public class BlockAction extends ShowAction {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         Block block = location.getBlock();
         block.setTypeId(type);
         block.setData(data);

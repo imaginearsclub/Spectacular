@@ -1,10 +1,10 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class LightningAction extends ShowAction {
     private Location loc;
@@ -19,7 +19,7 @@ public class LightningAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         loc.getWorld().strikeLightningEffect(loc);
     }
 

@@ -1,9 +1,9 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Marc on 7/1/15
@@ -17,7 +17,7 @@ public class FireworkExplodeAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         fw.detonate();
     }
 

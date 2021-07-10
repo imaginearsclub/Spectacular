@@ -1,11 +1,11 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
-import network.palace.core.utils.MiscUtil;
+import network.palace.show.utils.MiscUtil;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class SchematicAction extends ShowAction {
     private Location loc;
@@ -24,7 +24,7 @@ public class SchematicAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         try {
             show.getTerrainManager().loadSchematic(show.getWorldEditPlugin(), fname, loc, noAir);
         } catch (Exception e) {

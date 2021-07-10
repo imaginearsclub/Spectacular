@@ -2,9 +2,9 @@ package network.palace.show.actions;
 
 import lombok.Getter;
 import lombok.Setter;
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
+import org.bukkit.entity.Player;
 
 @Getter
 public abstract class ShowAction {
@@ -18,7 +18,7 @@ public abstract class ShowAction {
         this.time = time;
     }
 
-    public abstract void play(CPlayer[] nearPlayers);
+    public abstract void play(Player[] nearPlayers);
 
     public abstract ShowAction load(String line, String... args) throws ShowParseException;
 

@@ -2,9 +2,9 @@ package network.palace.show.handlers;
 
 import lombok.Getter;
 import lombok.Setter;
-import network.palace.core.npc.entity.EntityFallingBlock;
-import network.palace.core.npc.mob.MobArmorStand;
-import network.palace.core.pathfinding.Point;
+import network.palace.show.npc.entity.EntityFallingBlock;
+import network.palace.show.npc.mob.MobArmorStand;
+import network.palace.show.pathfinding.Point;
 import network.palace.show.Show;
 import network.palace.show.handlers.block.Build;
 import org.bukkit.Location;

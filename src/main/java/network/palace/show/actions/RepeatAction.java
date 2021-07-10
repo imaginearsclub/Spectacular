@@ -1,9 +1,9 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.ShowUtil;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
@@ -17,7 +17,7 @@ public class RepeatAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         for (int i = 0; i < occurrences; i++) {
             try {
                 ShowAction copy = repeatingAction.copy(show, time + ((long) interval * 50 * i));

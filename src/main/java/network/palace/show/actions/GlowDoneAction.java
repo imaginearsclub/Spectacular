@@ -1,6 +1,5 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.events.GlowDoneEvent;
 import network.palace.show.exceptions.ShowParseException;
@@ -19,7 +18,7 @@ public class GlowDoneAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         ItemStack air = new ItemStack(Material.AIR);
         for (Player tp : Bukkit.getOnlinePlayers()) {
             tp.getInventory().setHelmet(air);

@@ -1,8 +1,5 @@
 package network.palace.show.utils;
 
-import network.palace.core.Core;
-import network.palace.core.player.Rank;
-import network.palace.core.utils.MiscUtil;
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
 import network.palace.show.exceptions.ShowParseException;
@@ -48,7 +45,7 @@ public class ShowUtil {
     }
 
     public static int getInt(String s) throws ShowParseException {
-        if (!MiscUtil.checkIfInt(s)) {
+        if (MiscUtil.isNumeric(s)) {
             throw new ShowParseException("This isn't a number: " + s);
         }
         return Integer.parseInt(s);
@@ -310,10 +307,10 @@ public class ShowUtil {
     }
 
     public static void logDebug(String showName, String message) {
-        Core.logMessage("ShowDebug - " + showName, message);
-        Core.getPlayerManager().getOnlinePlayers().stream()
-                .filter(p -> p.getRank().getRankId() >= Rank.TRAINEEBUILD.getRankId() && p.getRegistry().hasEntry("show_debug"))
-                .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + showName + "] " + ChatColor.YELLOW + message));
+        Bukkit.getLogger().info("ShowDebug - " + showName + " " + message);
+//        Bukkit.getOnlinePlayers().stream()
+//                .filter(p -> p.hasPermission("") && p.getRegistry().hasEntry("show_debug"))
+//                .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + showName + "] " + ChatColor.YELLOW + message));
 
         Show s = ShowPlugin.getInstance().getShows().get(showName);
         if (s != null) s.debug();

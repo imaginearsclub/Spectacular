@@ -3,12 +3,8 @@ package network.palace.show;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import lombok.Getter;
 import lombok.Setter;
-import network.palace.audio.Audio;
-import network.palace.audio.handlers.AudioArea;
 import network.palace.show.actions.*;
 import network.palace.show.actions.armor.*;
-import network.palace.show.actions.audio.AudioStart;
-import network.palace.show.actions.audio.AudioSync;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.handlers.ArmorData;
 import network.palace.show.handlers.armorstand.PositionType;
@@ -342,10 +338,6 @@ public class Show {
             // Repeat
             RepeatAction ac = new RepeatAction(this, time);
             action = ac.load(strLine, args);
-        } else if (args[1].contains("Discord")) {
-            // Discord Ping
-            DiscordAction ac = new DiscordAction(this, time);
-            action = ac.load(strLine, args);
         } else if (args[1].contains("SpiralParticle")) {
             // SpiralParticle
             SpiralParticle ac = new SpiralParticle(this, time);
@@ -353,14 +345,6 @@ public class Show {
         } else if (args[1].contains("Particle")) {
             // Particle
             ParticleAction ac = new ParticleAction(this, time);
-            action = ac.load(strLine, args);
-        } else if (args[1].contains("AudioStart")) {
-            // AudioStart
-            AudioStart ac = new AudioStart(this, time);
-            action = ac.load(strLine, args);
-        } else if (args[1].contains("AudioSync")) {
-            // AudioSync
-            AudioSync ac = new AudioSync(this, time);
             action = ac.load(strLine, args);
         } else if (args[1].contains("Sequence")) {
             // Sequences
@@ -508,7 +492,7 @@ public class Show {
                 try {
                     action.play(nearPlayers);
                 } catch (Exception e) {
-                    Core.logMessage("Show " + action.getShow().getName(), "Error playing action in show " + action.getShow().getName());
+                    Bukkit.getLogger().severe("Show " + action.getShow().getName() + " Error playing action in show " + action.getShow().getName());
                 }
                 laterActions.remove(action);
             } catch (Exception e) {
@@ -525,7 +509,7 @@ public class Show {
             try {
                 temp.play(nearPlayers);
             } catch (Exception e) {
-                Core.logMessage("Show " + temp.getShow().getName(), "Error playing action in show " + temp.getShow().getName());
+                Bukkit.getLogger().severe("Show " + temp.getShow().getName() + " Error playing action in show " + temp.getShow().getName());
             }
 
             // then move to next action
@@ -566,17 +550,6 @@ public class Show {
 
     public Location getLocation() {
         return location.clone();
-    }
-
-    public void syncAudioForPlayer(final Player tp) {
-        final AudioArea area = Audio.getInstance().getByName(areaName);
-        if (area == null) {
-            return;
-        }
-        area.triggerPlayer(tp);
-        long ms = (System.currentTimeMillis() - musicTime);
-        float seconds = ms / 1000f;
-        area.sync(seconds, tp, 0);
     }
 
     public void stop() {

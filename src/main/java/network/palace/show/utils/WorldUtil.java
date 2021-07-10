@@ -1,13 +1,11 @@
 package network.palace.show.utils;
 
 import com.comphenix.protocol.utility.MinecraftReflection;
-import network.palace.core.Core;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Vehicle;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -72,7 +70,7 @@ public class WorldUtil {
     public static ArmorStand lock(ArmorStand stand) {
         try {
             String lockField;
-            switch (Core.getMinecraftVersion()) {
+            switch (Bukkit.getBukkitVersion()) {
                 case "v1_13_R1":
                 case "v1_13_R2":
                     lockField = "bH";
@@ -84,11 +82,11 @@ public class WorldUtil {
                     lockField = "bA";
                     break;
             }
-            Field f = Class.forName("net.minecraft.server." + Core.getMinecraftVersion() + ".EntityArmorStand")
+            Field f = Class.forName("net.minecraft.server." + Bukkit.getBukkitVersion() + ".EntityArmorStand")
                     .getDeclaredField(lockField);
             if (f != null) {
                 f.setAccessible(true);
-                Object craftStand = Class.forName("org.bukkit.craftbukkit." + Core.getMinecraftVersion() +
+                Object craftStand = Class.forName("org.bukkit.craftbukkit." + Bukkit.getBukkitVersion() +
                         ".entity.CraftArmorStand").cast(stand);
                 Object handle = craftStand.getClass().getDeclaredMethod("getHandle").invoke(craftStand);
                 f.set(handle, 2096896);

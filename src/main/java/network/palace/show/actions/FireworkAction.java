@@ -1,12 +1,12 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
@@ -34,7 +34,7 @@ public class FireworkAction extends ShowAction implements Listener {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         try {
             playFirework();
         } catch (Exception e) {

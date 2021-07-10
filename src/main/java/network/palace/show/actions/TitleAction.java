@@ -1,11 +1,11 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.handlers.TitleType;
 import network.palace.show.utils.ShowUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Marc on 1/10/15
@@ -31,14 +31,14 @@ public class TitleAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
-        for (CPlayer player : nearPlayers) {
+    public void play(Player[] nearPlayers) {
+        for (Player player : nearPlayers) {
             if (player == null) continue;
             if (Show.offset(player.getLocation(), show.getLocation()) < show.getRadius()) {
                 if (type.equals(TitleType.TITLE)) {
-                    player.getTitle().show(title, "", fadeIn, stay, fadeOut);
+                    player.sendTitle(title, "", fadeIn, stay, fadeOut);
                 } else {
-                    player.getTitle().show("", title, fadeIn, stay, fadeOut);
+                    player.sendTitle("", title, fadeIn, stay, fadeOut);
                 }
             }
         }

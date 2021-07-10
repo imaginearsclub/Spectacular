@@ -1,12 +1,12 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 public class PulseAction extends ShowAction {
     private Location loc;
@@ -22,7 +22,7 @@ public class PulseAction extends ShowAction {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         Block pre = loc.getBlock();
         final int id = pre.getTypeId();
         final byte data = pre.getData();

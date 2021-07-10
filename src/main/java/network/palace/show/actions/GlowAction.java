@@ -1,17 +1,19 @@
 package network.palace.show.actions;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import network.palace.core.packets.AbstractPacket;
-import network.palace.core.packets.server.entity.WrapperPlayServerEntityEquipment;
-import network.palace.core.player.CPlayer;
+import network.palace.show.ShowPlugin;
+import network.palace.show.packets.AbstractPacket;
+import network.palace.show.packets.server.entity.WrapperPlayServerEntityEquipment;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
+import network.palace.show.utils.MiscUtil;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
@@ -43,7 +45,7 @@ public class GlowAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         List<AbstractPacket> packets = new ArrayList<>();
         WrapperPlayServerEntityEquipment p = new WrapperPlayServerEntityEquipment();
         p.setSlot(EnumWrappers.ItemSlot.HEAD);
@@ -54,7 +56,7 @@ public class GlowAction extends ShowAction {
                 .collect(Collectors.toList())
                 .forEach(tp -> {
                     p.setEntityID(tp.getEntityId());
-                    tp.sendPacket(p);
+                    MiscUtil.sendPacket(p, tp);
                 });
     }
 

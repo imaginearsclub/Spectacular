@@ -1,9 +1,11 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class ActionBarAction extends ShowAction {
     private String text;
@@ -18,11 +20,11 @@ public class ActionBarAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
-        for (CPlayer player : nearPlayers) {
+    public void play(Player[] nearPlayers) {
+        for (Player player : nearPlayers) {
             if (player == null) continue;
             if (Show.offset(player.getLocation(), show.getLocation()) < show.getRadius()) {
-                player.getActionBar().show(text);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
             }
         }
     }

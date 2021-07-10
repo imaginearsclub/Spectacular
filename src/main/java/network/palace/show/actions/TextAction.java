@@ -1,8 +1,8 @@
 package network.palace.show.actions;
 
-import network.palace.core.player.CPlayer;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
+import org.bukkit.entity.Player;
 
 public class TextAction extends ShowAction {
     private String text;
@@ -17,7 +17,7 @@ public class TextAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         show.displayText(text);
     }
 

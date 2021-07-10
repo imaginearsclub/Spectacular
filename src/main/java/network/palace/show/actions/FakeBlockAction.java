@@ -4,17 +4,18 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import lombok.Getter;
 import lombok.Setter;
-import network.palace.core.Core;
-import network.palace.core.packets.server.block.WrapperPlayServerBlockChange;
-import network.palace.core.player.CPlayer;
+import network.palace.show.packets.server.block.WrapperPlayServerBlockChange;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.handlers.BlockData;
+import network.palace.show.utils.MiscUtil;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 /**
  * Created by Marc on 7/1/15
@@ -39,16 +40,16 @@ public class FakeBlockAction extends ShowAction {
     }
 
     @Override
-    public void play(CPlayer[] nearPlayers) {
+    public void play(Player[] nearPlayers) {
         try {
             WrapperPlayServerBlockChange p = new WrapperPlayServerBlockChange();
             p.setLocation(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
             p.setBlockData(WrappedBlockData.createData(Material.getMaterial(id), data));
-            for (CPlayer tp : nearPlayers) {
-                if (tp != null) tp.sendPacket(p);
+            for (Player tp : nearPlayers) {
+                if (tp != null) MiscUtil.sendPacket(p, tp);
             }
         } catch (Exception e) {
-            Core.logMessage("FakeBlockAction", ChatColor.RED + "Error sending FakeBlockAction for type (" +
+            Bukkit.getLogger().severe("FakeBlockAction -" + ChatColor.RED + "Error sending FakeBlockAction for type (" +
                     id + ":" + data + ") at location " + loc.getX() + "," + loc.getY() + "," + loc.getZ() + " at time " +
                     time + " for show " + show.getName());
             e.printStackTrace();
