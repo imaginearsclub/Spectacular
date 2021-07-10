@@ -45,7 +45,7 @@ public class ShowUtil {
     }
 
     public static int getInt(String s) throws ShowParseException {
-        if (MiscUtil.isNumeric(s)) {
+        if (!MiscUtil.checkIfInt(s)) {
             throw new ShowParseException("This isn't a number: " + s);
         }
         return Integer.parseInt(s);

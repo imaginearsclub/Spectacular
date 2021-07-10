@@ -6,6 +6,7 @@ import network.palace.show.commands.show.StartCommand;
 import network.palace.show.commands.show.StopCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.block.CommandBlock;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,8 +33,8 @@ public class ShowCommand implements CommandExecutor {
                 case "start":
                     if (sender instanceof Player) {
                         new StartCommand().handle(sender, args[1], ((Player) sender).getWorld());
-                    } else if (sender instanceof CommandBlock) {
-                        new StartCommand().handle(sender, args[1], ((CommandBlock) sender).getWorld());
+                    } else if (sender instanceof BlockCommandSender) {
+                        new StartCommand().handle(sender, args[1], ((BlockCommandSender) sender).getBlock().getWorld());
                     } else {
                         sender.sendMessage(ChatColor.RED + "You cannot run this from the console!");
                     }
