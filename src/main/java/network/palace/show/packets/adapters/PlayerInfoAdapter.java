@@ -4,7 +4,9 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
-import network.palace.show.Core;
+import network.palace.show.ShowPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public class PlayerInfoAdapter extends PacketAdapter {
 
     public PlayerInfoAdapter() {
-        super(Core.getInstance(), PacketType.Play.Server.PLAYER_INFO);
+        super(ShowPlugin.getInstance(), PacketType.Play.Server.PLAYER_INFO);
     }
 
     @Override
@@ -29,7 +31,7 @@ public class PlayerInfoAdapter extends PacketAdapter {
         for (Object infoDataObj : playerInfo) {
             if (infoDataObj instanceof PlayerInfoData) {
                 PlayerInfoData infoData = (PlayerInfoData) infoDataObj;
-                CPlayer player = Core.getPlayerManager().getPlayer(infoData.getProfile().getName());
+                Player player = Bukkit.getPlayer(infoData.getProfile().getName());
                 if (player == null) return;
 //                player.setPing(infoData.getLatency());
             }

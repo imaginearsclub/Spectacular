@@ -7,6 +7,7 @@ import network.palace.show.packets.server.entity.WrapperPlayServerSpawnEntity;
 import network.palace.show.pathfinding.Point;
 
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.Set;
 import java.util.UUID;
@@ -15,7 +16,7 @@ public class EntityFallingBlock extends AbstractEntity {
     @Getter private final int typeId;
     @Getter private final byte data;
 
-    public EntityFallingBlock(Point location, Set<CPlayer> observers, String title, int typeId, byte data) {
+    public EntityFallingBlock(Point location, Set<Player> observers, String title, int typeId, byte data) {
         super(location, observers, title);
         this.typeId = typeId;
         this.data = data;

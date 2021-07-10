@@ -1,7 +1,6 @@
 package network.palace.show.commands.show;
 
-import network.palace.core.command.CommandException;
-import network.palace.core.command.CoreCommand;
+
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
 import org.bukkit.ChatColor;
@@ -11,14 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ListCommand extends CoreCommand {
+public class ListCommand {
 
-    public ListCommand() {
-        super("list");
-    }
-
-    @Override
-    protected void handleCommandUnspecific(CommandSender sender, String[] args) throws CommandException {
+    public void runList(CommandSender sender) {
         List<String> shows = new ArrayList<>();
         for (Map.Entry<String, Show> entry : ShowPlugin.getShows().entrySet()) {
             shows.add(entry.getValue().getWorld().getName() + ":" + entry.getKey());

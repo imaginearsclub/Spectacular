@@ -1,27 +1,27 @@
 package network.palace.show.commands;
 
-import network.palace.core.command.CommandException;
-import network.palace.core.command.CommandMeta;
-import network.palace.core.command.CoreCommand;
-import network.palace.core.player.CPlayer;
-import network.palace.core.player.Rank;
+import network.palace.show.ShowPlugin;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-@CommandMeta(description = "Toggle show debug mode", rank = Rank.TRAINEETECH)
-public class ShowDebugCommand extends CoreCommand {
-
-    public ShowDebugCommand() {
-        super("showdebug");
-    }
+public class ShowDebugCommand implements CommandExecutor {
 
     @Override
-    protected void handleCommand(CPlayer player, String[] args) throws CommandException {
-        if (!player.getRegistry().hasEntry("show_debug")) {
-            player.getRegistry().addEntry("show_debug", true);
-            player.sendMessage(ChatColor.AQUA + "[ShowDebug] - " + ChatColor.GREEN + "Enabled");
-        } else {
-            player.getRegistry().removeEntry("show_debug");
-            player.sendMessage(ChatColor.AQUA + "[ShowDebug] - " + ChatColor.RED + "Disabled");
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+
+            if (!ShowPlugin.debugMap.containsKey(player.getDisplayName())) {
+                ShowPlugin.debugMap.put(player.getDisplayName(), true);
+                player.sendMessage(ChatColor.AQUA + "[ShowDebug] - " + ChatColor.GREEN + "Enabled");
+            } else {
+                ShowPlugin.debugMap.remove(player.getDisplayName());
+                player.sendMessage(ChatColor.AQUA + "[ShowDebug] - " + ChatColor.RED + "Disabled");
+            }
         }
+        return false;
     }
 }

@@ -569,11 +569,10 @@ public class Show {
             }
         }
         if (debug > 0) {
-//            Bukkit.getOnlinePlayers()
-//            Bukkit.getOnlinePlayers().stream()
-//                    .filter(p -> p.hasPermission() >= Rank.TRAINEETECH.getRankId())
-//                    .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + getName() + "] " +
-//                            ChatColor.YELLOW + debug + " debug messages were hidden."));
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(p -> p.hasPermission("show.debug") | p.isOp())
+                    .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + getName() + "] " +
+                            ChatColor.YELLOW + debug + " debug messages were hidden."));
         }
     }
 

@@ -7,14 +7,21 @@ import network.palace.show.commands.*;
 import network.palace.show.generator.ShowGenerator;
 import network.palace.show.listeners.ChunkListener;
 import network.palace.show.listeners.PlayerInteract;
-import network.palace.show.listeners.SignChange;
 import network.palace.show.npc.SoftNPCManager;
 import network.palace.show.utils.BuildUtil;
 import network.palace.show.utils.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginLoadOrder;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.annotation.command.Command;
+import org.bukkit.plugin.java.annotation.dependency.Dependency;
+import org.bukkit.plugin.java.annotation.plugin.Description;
+import org.bukkit.plugin.java.annotation.plugin.LoadOrder;
+import org.bukkit.plugin.java.annotation.plugin.LogPrefix;
+import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +30,19 @@ import java.util.Map;
  * Created by Marc on 12/6/16.
  * Updated to be Core free by Tom 07/10/2021
  */
+@Plugin(name = "Show", version = "1.5.5")
+@Description(value = "Create Shows in Minecraft with easy to use files!")
+@LoadOrder(value = PluginLoadOrder.POSTWORLD)
+@Author(value = "Legobuilder0813")
+@Author(value = "Parker")
+@Author(value = "Innectic")
+@Author(value = "Cubits")
+@LogPrefix(value = "Show")
+@Dependency(value = "WorldEdit")
+@Dependency(value = "ProtocolLib")
+@Command(name = "show", desc = "Main show command", permission = "show.main", permissionMessage = "You do not have permission!", usage = "/show [list|start|stop]")
+@Command(name = "showdebug", desc = "Showdebug command", permission = "show.debug", permissionMessage = "You do not have permission!", usage = "/showdebug")
+
 public class ShowPlugin extends JavaPlugin {
     @Getter private ArmorStandManager armorStandManager;
     @Getter private FountainManager fountainManager;
@@ -32,6 +52,7 @@ public class ShowPlugin extends JavaPlugin {
     @Getter private final boolean isMinecraftGreaterOrEqualTo11_2 = MinecraftVersion.getCurrentVersion().getMinor() >= 12;
     private static ShowPlugin instance;
     private static final HashMap<String, Show> shows = new HashMap<>();
+
     private int taskid = 0;
 
     public static ShowPlugin getInstance() {
@@ -47,15 +68,13 @@ public class ShowPlugin extends JavaPlugin {
         buildUtil = new BuildUtil();
         softNPCManager = new SoftNPCManager();
         FileUtil.setupFiles();
-        registerCommand(new ShowCommand());
-        registerCommand(new ShowBuildCommand());
-        registerCommand(new ShowGenCommand());
-        registerCommand(new ShowDebugCommand());
+        this.getCommand("show").setExecutor(new ShowCommand());
+        this.getCommand("showdebug").setExecutor(new ShowDebugCommand());
 
-        registerListener(fountainManager);
-        registerListener(new PlayerInteract());
-        registerListener(new SignChange());
-        registerListener(new ChunkListener());
+        this.getServer().getPluginManager().registerEvents(fountainManager, this);
+        this.getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
+        this.getServer().getPluginManager().registerEvents(new ChunkListener(), this);
+
         // Show Ticker
         taskid = Bukkit.getScheduler().runTaskTimer(this, () -> {
             for (Map.Entry<String, Show> entry : new HashMap<>(shows).entrySet()) {
@@ -74,7 +93,7 @@ public class ShowPlugin extends JavaPlugin {
         int size = shows.size();
         if (size > 0) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getRank().getRankId() >= Rank.TRAINEE.getRankId()) {
+                if (p.hasPermission("shows.main") | p.isOp()) {
                     p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Reloading Show plugin, there are currently " +
                             size + " shows running!");
                 }
@@ -90,6 +109,8 @@ public class ShowPlugin extends JavaPlugin {
     public static HashMap<String, Show> getShows() {
         return new HashMap<>(shows);
     }
+
+    public static HashMap<String, Boolean> debugMap = new HashMap<String, Boolean>();
 
     public static void startShow(String name, Show show) {
         shows.put(name, show);

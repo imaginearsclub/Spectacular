@@ -308,9 +308,9 @@ public class ShowUtil {
 
     public static void logDebug(String showName, String message) {
         Bukkit.getLogger().info("ShowDebug - " + showName + " " + message);
-//        Bukkit.getOnlinePlayers().stream()
-//                .filter(p -> p.hasPermission("") && p.getRegistry().hasEntry("show_debug"))
-//                .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + showName + "] " + ChatColor.YELLOW + message));
+        Bukkit.getOnlinePlayers().stream()
+                .filter(p -> p.hasPermission("show.debug") && ShowPlugin.debugMap.containsKey(p.getDisplayName()))
+                .forEach(p -> p.sendMessage(ChatColor.AQUA + "[ShowDebug - " + showName + "] " + ChatColor.YELLOW + message));
 
         Show s = ShowPlugin.getInstance().getShows().get(showName);
         if (s != null) s.debug();

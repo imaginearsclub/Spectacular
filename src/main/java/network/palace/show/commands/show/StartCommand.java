@@ -1,70 +1,36 @@
 package network.palace.show.commands.show;
 
-import network.palace.core.Core;
-import network.palace.core.command.CommandException;
-import network.palace.core.command.CoreCommand;
-import network.palace.core.player.CPlayer;
+
 import network.palace.show.Show;
 import network.palace.show.ShowPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * @author Marc
  * @since 8/2/17
  */
-public class StartCommand extends CoreCommand {
+public class StartCommand  {
 
-    public StartCommand() {
-        super("start");
-    }
-
-    @Override
-    protected void handleCommand(CPlayer player, String[] args) throws CommandException {
-        handle(player.getBukkitPlayer(), args, player.getWorld());
-    }
-
-    @Override
-    protected void handleCommand(BlockCommandSender commandSender, String[] args) throws CommandException {
-        handle(commandSender, args, commandSender.getBlock().getWorld());
-    }
-
-    @Override
-    protected void handleCommand(ConsoleCommandSender commandSender, String[] args) throws CommandException {
-        try {
-            if (args[1] == null) {
-                commandSender.sendMessage(ChatColor.RED + "You have to specify a world to run this in!");
-                return;
-            }
-            handle(commandSender, args, Bukkit.getWorld(args[1]));
-        } catch (Exception e) {
-            commandSender.sendMessage(ChatColor.RED + "Encountered an unexpected error!");
-        }
-    }
-
-    private void handle(CommandSender sender, String[] args, World world) {
+    public void handle(CommandSender sender, String filename, World world) {
         if (world == null || world.getName() == null) {
             sender.sendMessage(ChatColor.RED + "Invalid world!");
             return;
         }
-        if (args.length == 0) {
+        if (filename == null | filename.equals("")) {
             sender.sendMessage(ChatColor.RED + "/show start [Show Name]");
             return;
         }
-        if (ShowPlugin.getShows().containsKey(args[0])) {
+        if (ShowPlugin.getShows().containsKey(filename)) {
             sender.sendMessage(ChatColor.RED + "----------------------------------------------");
             sender.sendMessage(ChatColor.RED + "That show is already running!");
             sender.sendMessage(ChatColor.RED + "----------------------------------------------");
             return;
         }
-        File f = new File("plugins/Show/shows/" + world.getName() + "/" + args[0] + ".show");
+        File f = new File("plugins/Show/shows/" + world.getName() + "/" + filename + ".show");
         if (!f.exists()) {
             sender.sendMessage(ChatColor.RED + "----------------------------------------------");
             sender.sendMessage(ChatColor.RED + "That show doesn't exist! Looking at: " + f.getPath());
@@ -72,7 +38,7 @@ public class StartCommand extends CoreCommand {
             return;
         }
         sender.sendMessage(ChatColor.GREEN + "Starting... ");
-        ShowPlugin.startShow(args[0], new Show(f, world));
-        sender.sendMessage(ChatColor.GREEN + args[0] + ChatColor.AQUA + " has started on world " + ChatColor.YELLOW + world.getName());
+        ShowPlugin.startShow(filename, new Show(f, world));
+        sender.sendMessage(ChatColor.GREEN + filename + ChatColor.AQUA + " has started on world " + ChatColor.YELLOW + world.getName());
     }
 }
