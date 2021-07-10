@@ -225,6 +225,14 @@ public class Show {
             // Music
             MusicAction ac = new MusicAction(this, time);
             action = ac.load(strLine, args);
+        } else if (args[1].contains("AudioRegion")) {
+            //Audio Region
+            AudioPlayRegionAction ac = new AudioPlayRegionAction(this, time);
+            action = ac.load(strLine, args);
+        } else if (args[1].contains("AudioOnce")) {
+            //Audio Once to those near
+            AudioPlaceOnceAction ac = new AudioPlaceOnceAction(this, time);
+            action = ac.load(strLine, args);
         } else if (args[1].contains("Pulse")) {
             // Pulse
             PulseAction ac = new PulseAction(this, time);

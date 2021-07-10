@@ -2,6 +2,8 @@ package network.palace.show;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.utility.MinecraftVersion;
+import com.craftmend.openaudiomc.api.interfaces.AudioApi;
+import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
 import lombok.Getter;
 import network.palace.show.commands.*;
 import network.palace.show.generator.ShowGenerator;
@@ -40,6 +42,7 @@ import java.util.Map;
 @LogPrefix(value = "Show")
 @Dependency(value = "WorldEdit")
 @Dependency(value = "ProtocolLib")
+@Dependency(value = "OpenAudioMc")
 @Command(name = "show", desc = "Main show command", permission = "show.main", permissionMessage = "You do not have permission!", usage = "/show [list|start|stop]")
 @Command(name = "showdebug", desc = "Showdebug command", permission = "show.debug", permissionMessage = "You do not have permission!", usage = "/showdebug")
 
@@ -50,6 +53,8 @@ public class ShowPlugin extends JavaPlugin {
     @Getter private static BuildUtil buildUtil;
     @Getter private static SoftNPCManager softNPCManager;
     @Getter private final boolean isMinecraftGreaterOrEqualTo11_2 = MinecraftVersion.getCurrentVersion().getMinor() >= 12;
+    @Getter private static AudioApi audioApi;
+    @Getter private static OpenAudioMcSpigot openAudioMcSpigot;
     private static ShowPlugin instance;
     private static final HashMap<String, Show> shows = new HashMap<>();
 
@@ -67,6 +72,8 @@ public class ShowPlugin extends JavaPlugin {
         showGenerator = new ShowGenerator();
         buildUtil = new BuildUtil();
         softNPCManager = new SoftNPCManager();
+        audioApi = AudioApi.getInstance();
+        openAudioMcSpigot = OpenAudioMcSpigot.getInstance();
         FileUtil.setupFiles();
         this.getCommand("show").setExecutor(new ShowCommand());
         this.getCommand("showdebug").setExecutor(new ShowDebugCommand());
