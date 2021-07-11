@@ -99,8 +99,8 @@ public class ShowPlugin extends JavaPlugin {
         Metrics metrics = new Metrics(this, pluginId);
 
 
-        Bukkit.getLogger().info("Show is now enabled!");
-        Bukkit.getLogger().info("Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Show is now enabled!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
     }
 
     @Override

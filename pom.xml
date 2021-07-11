@@ -116,6 +116,7 @@
                                 <includes>
                                     <include>com.goebl</include>
                                     <include>org.json</include>
+                                    <include>org.bstats</include>
                                 </includes>
                             </artifactSet>
                             <filters>
@@ -133,8 +134,8 @@
                             </filters>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>network.palace</shadedPattern>
+                                    <pattern>org.bstats.</pattern>
+                                    <shadedPattern>network.palace.</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
