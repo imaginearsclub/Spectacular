@@ -87,6 +87,13 @@ Colors: Red, Orange, Yellow, Green, Aqua, Blue, Purple, Pink, White, Black (or r
 # = time fountain is on
 2.1	Fountain	35:0	1.9	0,10,0	0,0.8,0
 
+### Commands ###
+#Run commands:
+<seconds> Command   <command goes here (supports spaces & no slash)>
+
+### Repeating Actions ###
+#Repeats actions multiple times:
+<seconds>   Repeat  <occurences>    <delay> <Normal Show Action (minus the starting seconds>
 
 ### Audio ###
 <seconds>	AudioRegion <wgregionname>  <length>    <volume>    <linktosound>
