@@ -6,6 +6,7 @@ import network.palace.show.handlers.BlockData;
 import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -29,8 +30,11 @@ public class BlockAction extends ShowAction {
     @Override
     public void play(Player[] nearPlayers) {
         Block block = location.getBlock();
-        block.setTypeId(type);
-        block.setData(data);
+        if (ShowUtil.convertMaterial(type, data) != null) {
+            block.setType(ShowUtil.convertMaterial(type, data));
+        } else {
+            block.setType(Material.STONE);
+        }
     }
 
     @Override
@@ -44,6 +48,9 @@ public class BlockAction extends ShowAction {
             this.location = loc;
             this.type = data.getId();
             this.data = data.getData();
+            if (ShowUtil.convertMaterial(type, data.getData()) == null) {
+                throw new ShowParseException("Could not parse the given id into a Spigot Material");
+            }
         } catch (ShowParseException e) {
             throw new ShowParseException(e.getReason());
         }

@@ -44,7 +44,7 @@ public class FakeBlockAction extends ShowAction {
         try {
             WrapperPlayServerBlockChange p = new WrapperPlayServerBlockChange();
             p.setLocation(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-            p.setBlockData(WrappedBlockData.createData(Material.getMaterial(id), data));
+            p.setBlockData(WrappedBlockData.createData(Material.getMaterial(ShowUtil.convertMaterial(id, data).name()), data));
             for (Player tp : nearPlayers) {
                 if (tp != null) MiscUtil.sendPacket(p, tp);
             }

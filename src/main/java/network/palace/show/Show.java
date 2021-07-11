@@ -415,7 +415,7 @@ public class Show {
                     String[] l = color[0].split(":");
                     int id = Integer.parseInt(l[0]);
                     byte dam = l.length > 1 ? Byte.parseByte(l[1]) : 0;
-                    Material type = Material.getMaterial(id);
+                    Material type = Material.getMaterial(ShowUtil.convertMaterialNoData(id).name());
                     if (!type.name().toLowerCase().contains("leather")) {
                         continue;
                     }
@@ -447,7 +447,7 @@ public class Show {
                 String[] l = st.split(":");
                 int id = Integer.parseInt(l[0]);
                 byte dam = l.length > 1 ? Byte.parseByte(l[1]) : 0;
-                ItemStack temp = new ItemStack(Material.getMaterial(id), 1, dam);
+                ItemStack temp = new ItemStack(Material.getMaterial(ShowUtil.convertMaterialNoData(id).name()), 1, dam);
                 switch (i) {
                     case 1:
                         head = temp;

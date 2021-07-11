@@ -20,10 +20,7 @@ import org.bukkit.plugin.PluginLoadOrder;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
-import org.bukkit.plugin.java.annotation.plugin.Description;
-import org.bukkit.plugin.java.annotation.plugin.LoadOrder;
-import org.bukkit.plugin.java.annotation.plugin.LogPrefix;
-import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.*;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.util.HashMap;
@@ -44,6 +41,7 @@ import java.util.Map;
 @Dependency(value = "WorldEdit")
 @Dependency(value = "ProtocolLib")
 @Dependency(value = "OpenAudioMc")
+@ApiVersion(value = ApiVersion.Target.v1_13)
 @Command(name = "show", desc = "Main show command", permission = "show.main", permissionMessage = "You do not have permission!", usage = "/show [list|start|stop]")
 @Command(name = "showdebug", desc = "Showdebug command", permission = "show.debug", permissionMessage = "You do not have permission!", usage = "/showdebug")
 

@@ -83,14 +83,15 @@ public class Pathfinder {
             case AIR:
             case LAVA:
             case WATER:
-            case PORTAL:
+            case END_PORTAL:
+            case NETHER_PORTAL:
                 return true;
             case IRON_DOOR:
             case DARK_OAK_DOOR:
             case ACACIA_DOOR:
             case BIRCH_DOOR:
             case JUNGLE_DOOR:
-            case WOODEN_DOOR:
+            case OAK_DOOR:
             case SPRUCE_DOOR:
                 Door door = (Door) b.getState();
                 return door.isOpen();
@@ -98,7 +99,7 @@ public class Pathfinder {
             case BIRCH_FENCE_GATE:
             case DARK_OAK_FENCE_GATE:
             case JUNGLE_FENCE_GATE:
-            case FENCE_GATE:
+            case OAK_FENCE_GATE:
             case SPRUCE_FENCE_GATE:
                 Gate gate = (Gate) b.getState();
                 return gate.isOpen();
@@ -113,17 +114,32 @@ public class Pathfinder {
         switch (b.getType()) {
             case LADDER:
             case WHEAT:
-            case LONG_GRASS:
-            case RAILS:
+            case GRASS:
+            case RAIL:
             case ACTIVATOR_RAIL:
             case DETECTOR_RAIL:
             case POWERED_RAIL:
             case CAULDRON:
-            case YELLOW_FLOWER:
+            case DANDELION:
             case FLOWER_POT:
-            case RED_ROSE:
-            case CAKE_BLOCK:
-            case CARPET:
+            case POPPY:
+            case CAKE:
+            case CYAN_CARPET:
+            case BLACK_CARPET:
+            case BLUE_CARPET:
+            case BROWN_CARPET:
+            case GRAY_CARPET:
+            case GREEN_CARPET:
+            case LIGHT_BLUE_CARPET:
+            case LIGHT_GRAY_CARPET:
+            case LIME_CARPET:
+            case MAGENTA_CARPET:
+            case ORANGE_CARPET:
+            case PINK_CARPET:
+            case PURPLE_CARPET:
+            case RED_CARPET:
+            case WHITE_CARPET:
+            case YELLOW_CARPET:
                 return false;
             default:
                 return true;

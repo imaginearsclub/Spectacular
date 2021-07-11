@@ -7,11 +7,13 @@ import network.palace.show.handlers.BlockData;
 import network.palace.show.handlers.TitleType;
 import network.palace.show.sequence.ShowSequence;
 import org.bukkit.*;
+import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +44,18 @@ public class ShowUtil {
         } catch (Exception ignored) {
             throw new ShowParseException("Invalid Block ID or Block data");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Material convertMaterial(int ID, byte Data) {
+        for(Material i : EnumSet.allOf(Material.class)) if(i.getId() == ID) return Bukkit.getUnsafe().fromLegacy(new MaterialData(i, Data));
+        return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Material convertMaterialNoData(int ID) {
+        for(Material i : EnumSet.allOf(Material.class)) if(i.getId() == ID) return Bukkit.getUnsafe().fromLegacy(new MaterialData(i));
+        return null;
     }
 
     public static int getInt(String s) throws ShowParseException {
@@ -238,8 +252,6 @@ public class ShowUtil {
                 return Particle.FIREWORKS_SPARK;
             case "flame":
                 return Particle.FLAME;
-            case "footstep":
-                return Particle.FOOTSTEP;
             case "happyvillager":
                 return Particle.VILLAGER_HAPPY;
             case "heart":

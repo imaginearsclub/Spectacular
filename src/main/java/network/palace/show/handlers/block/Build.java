@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.palace.show.utils.ShowUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -44,7 +45,7 @@ public class Build {
             for (int y = lowY; y <= Math.max(loc1.getBlockY(), loc2.getBlockY()); y++) {
                 for (int z = lowZ; z <= Math.max(loc1.getBlockZ(), loc2.getBlockZ()); z++) {
                     Block b = world.getBlockAt(x, y, z);
-                    list.add(new BuildBlock(x - lowX, y - lowY, z - lowZ, b.getTypeId(), b.getData()));
+                    list.add(new BuildBlock(x - lowX, y - lowY, z - lowZ, b.getType().getId(), b.getData()));
                 }
             }
         }
@@ -59,8 +60,7 @@ public class Build {
         Block b = loc.getBlock();
         for (BuildBlock block : blocks) {
             Block rel = b.getRelative(block.getX(), block.getY(), block.getZ());
-            rel.setType(Material.getMaterial(block.getTypeId()));
-            rel.setData(block.getData());
+            rel.setType(Material.getMaterial(ShowUtil.convertMaterial(block.getTypeId(), block.getData()).name()));
         }
     }
 
