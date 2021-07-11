@@ -80,7 +80,7 @@ public class Show {
     }
 
     private void loadActions(File file, long addTime) {
-        List<ShowAction> actions = new ArrayList<>() {
+        List<ShowAction> actions = new ArrayList<ShowAction>() {
             public boolean add(ShowAction mt) {
                 int index = Collections.binarySearch(this, mt, (o1, o2) -> (int) (o1.getTime() - o2.getTime()));
                 if (index < 0) index = ~index;

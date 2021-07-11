@@ -6,7 +6,7 @@
 
     <groupId>network.palace</groupId>
     <artifactId>Show</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.6</version>
     <repositories>
         <repository>
             <id>enginehub-maven</id>
@@ -74,12 +74,18 @@
             <version>6.5.4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <build>
@@ -110,6 +116,7 @@
                                 <includes>
                                     <include>com.goebl</include>
                                     <include>org.json</include>
+                                    <include>org.bstats</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

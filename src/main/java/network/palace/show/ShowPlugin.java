@@ -12,6 +12,7 @@ import network.palace.show.listeners.PlayerInteract;
 import network.palace.show.npc.SoftNPCManager;
 import network.palace.show.utils.BuildUtil;
 import network.palace.show.utils.FileUtil;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ import java.util.Map;
  * Created by Marc on 12/6/16.
  * Updated to be Core free by Tom 07/10/2021
  */
-@Plugin(name = "Show", version = "1.5.5")
+@Plugin(name = "Show", version = "1.5.6")
 @Description(value = "Create Shows in Minecraft with easy to use files!")
 @LoadOrder(value = PluginLoadOrder.POSTWORLD)
 @Author(value = "Legobuilder0813")
@@ -92,6 +93,12 @@ public class ShowPlugin extends JavaPlugin {
                 }
             }
         }, 0L, 1L).getTaskId();
+
+        int pluginId = 12010;
+
+        Metrics metrics = new Metrics(this, pluginId);
+
+
         Bukkit.getLogger().info("Show is now enabled!");
         Bukkit.getLogger().info("Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
     }
