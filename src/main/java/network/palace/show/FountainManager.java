@@ -4,6 +4,7 @@ import network.palace.show.handlers.Fountain;
 import network.palace.show.utils.ShowUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
@@ -33,11 +34,10 @@ public class FountainManager implements Listener {
                     continue;
                 }
                 Location loc = fon.getLocation();
-                int type = fon.getType();
-                byte data = fon.getData();
+                Material mat = fon.getMat();
                 Vector force = fon.getForce();
-                FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, ShowUtil.convertMaterial(type, data), data);
-                Bukkit.getLogger().info(String.valueOf(ShowUtil.convertMaterial(type, data)));
+                FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, mat, (byte) 0);
+                Bukkit.getLogger().info(String.valueOf(mat));
                 fb.setVelocity(force);
                 fb.setMetadata("dontplaceblock", new FixedMetadataValue(ShowPlugin.getInstance(), true));
             }

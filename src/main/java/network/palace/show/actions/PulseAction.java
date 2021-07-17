@@ -24,10 +24,9 @@ public class PulseAction extends ShowAction {
     @Override
     public void play(Player[] nearPlayers) {
         Block pre = loc.getBlock();
-        final int id = pre.getType().getId();
-        final byte data = pre.getData();
+        final Material mat = pre.getType();
         loc.getBlock().setType(Material.REDSTONE_BLOCK);
-        show.addLaterAction(new BlockAction(show, show.getShowTime() + 100, loc, id, data));
+        show.addLaterAction(new BlockAction(show, show.getShowTime() + 100, loc, mat));
     }
 
     @Override

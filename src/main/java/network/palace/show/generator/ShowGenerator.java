@@ -6,6 +6,7 @@ import network.palace.show.ShowPlugin;
 import network.palace.show.actions.FakeBlockAction;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -52,12 +53,11 @@ public class ShowGenerator {
         for (FakeBlockAction action : actions) {
             Location loc = action.getLoc();
             double time = ((int) ((action.getTime() / 1000.0) * 10)) / 10.0;
-            int id = action.getId();
-            byte data = action.getData();
+            Material mat = action.getMat();
             int x = loc.getBlockX();
             int y = loc.getBlockY();
             int z = loc.getBlockZ();
-            String actionString = time + "\u0009" + "FakeBlock" + "\u0009" + id + ":" + data + "\u0009" + x + "," + y + "," + z;
+            String actionString = time + "\u0009" + "FakeBlock" + "\u0009" + mat.toString() + "\u0009" + x + "," + y + "," + z;
             content.append(actionString).append("\n");
         }
 

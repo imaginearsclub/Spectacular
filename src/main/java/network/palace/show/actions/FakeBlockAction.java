@@ -25,18 +25,16 @@ import org.bukkit.entity.Player;
 @SuppressWarnings("deprecation")
 public class FakeBlockAction extends ShowAction {
     private Location loc;
-    private int id;
-    private byte data;
+    private Material mat;
 
     public FakeBlockAction(Show show, long time) {
         super(show, time);
     }
 
-    public FakeBlockAction(Show show, long time, Location loc, int id, byte data) {
+    public FakeBlockAction(Show show, long time, Location loc, Material mat) {
         super(show, time);
         this.loc = loc;
-        this.id = id;
-        this.data = data;
+        this.mat = mat;
     }
 
     @Override
@@ -44,13 +42,13 @@ public class FakeBlockAction extends ShowAction {
         try {
             WrapperPlayServerBlockChange p = new WrapperPlayServerBlockChange();
             p.setLocation(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-            p.setBlockData(WrappedBlockData.createData(Material.getMaterial(ShowUtil.convertMaterial(id, data).name()), data));
+            p.setBlockData(WrappedBlockData.createData(mat));
             for (Player tp : nearPlayers) {
                 if (tp != null) MiscUtil.sendPacket(p, tp);
             }
         } catch (Exception e) {
             Bukkit.getLogger().severe("FakeBlockAction -" + ChatColor.RED + "Error sending FakeBlockAction for type (" +
-                    id + ":" + data + ") at location " + loc.getX() + "," + loc.getY() + "," + loc.getZ() + " at time " +
+                    mat.toString() + ") at location " + loc.getX() + "," + loc.getY() + "," + loc.getZ() + " at time " +
                     time + " for show " + show.getName());
             e.printStackTrace();
         }
@@ -63,18 +61,16 @@ public class FakeBlockAction extends ShowAction {
             throw new ShowParseException("Invalid Location " + line);
         }
         try {
-            BlockData data = ShowUtil.getBlockData(args[2]);
             this.loc = loc;
-            this.id = data.getId();
-            this.data = data.getData();
-        } catch (ShowParseException e) {
-            throw new ShowParseException(e.getReason());
+            this.mat = Material.valueOf(args[2]);
+        } catch (IllegalArgumentException e) {
+            throw new ShowParseException(e.getMessage());
         }
         return this;
     }
 
     @Override
     protected ShowAction copy(Show show, long time) throws ShowParseException {
-        return new FakeBlockAction(show, time, loc, id, data);
+        return new FakeBlockAction(show, time, loc, mat);
     }
 }

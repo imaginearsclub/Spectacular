@@ -1,21 +1,19 @@
 package network.palace.show.handlers;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 public class Fountain {
     public double duration;
     public Location loc;
-    public int type;
-    public byte data;
+    public Material mat;
     public Vector force;
 
-    public Fountain(Location loc, double duration, int type, byte data,
-                    Vector force) {
+    public Fountain(Location loc, double duration, Material mat, Vector force) {
         this.loc = loc;
         this.duration = duration;
-        this.type = type;
-        this.data = data;
+        this.mat = mat;
         this.force = force;
     }
 
@@ -35,27 +33,19 @@ public class Fountain {
         this.duration = duration;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public byte getData() {
-        return data;
-    }
-
-    public void setData(byte data) {
-        this.data = data;
-    }
-
     public Vector getForce() {
         return force;
     }
 
     public void setForce(Vector force) {
         this.force = force;
+    }
+
+    public Material getMat() {
+        return mat;
+    }
+
+    public void setMat(Material mat) {
+        this.mat = mat;
     }
 }

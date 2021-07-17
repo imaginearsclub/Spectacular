@@ -12,29 +12,23 @@ import org.bukkit.entity.Player;
 
 public class BlockAction extends ShowAction {
     public Location location;
-    public int type;
-    public byte data;
+    public Material blockMat;
 
     public BlockAction(Show show, long time) {
         super(show, time);
     }
 
-    public BlockAction(Show show, long time, Location location, int type, byte data) {
+    public BlockAction(Show show, long time, Location location, Material blockMat) {
         super(show, time);
         this.location = location;
-        this.type = type;
-        this.data = data;
+        this.blockMat = blockMat;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void play(Player[] nearPlayers) {
         Block block = location.getBlock();
-        if (ShowUtil.convertMaterial(type, data) != null) {
-            block.setType(ShowUtil.convertMaterial(type, data));
-        } else {
-            block.setType(Material.STONE);
-        }
+        block.setType(blockMat);
     }
 
     @Override
@@ -44,21 +38,16 @@ public class BlockAction extends ShowAction {
             throw new ShowParseException("Invalid Location " + line);
         }
         try {
-            BlockData data = ShowUtil.getBlockData(args[2]);
+            this.blockMat = Material.valueOf(args[2]);
             this.location = loc;
-            this.type = data.getId();
-            this.data = data.getData();
-            if (ShowUtil.convertMaterial(type, data.getData()) == null) {
-                throw new ShowParseException("Could not parse the given id into a Spigot Material");
-            }
-        } catch (ShowParseException e) {
-            throw new ShowParseException(e.getReason());
+        } catch (IllegalArgumentException e) {
+            throw new ShowParseException(e.getMessage());
         }
         return this;
     }
 
     @Override
     protected ShowAction copy(Show show, long time) throws ShowParseException {
-        return new BlockAction(show, time, location, type, data);
+        return new BlockAction(show, time, location, blockMat);
     }
 }
