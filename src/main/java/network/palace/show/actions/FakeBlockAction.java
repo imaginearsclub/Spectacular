@@ -62,7 +62,7 @@ public class FakeBlockAction extends ShowAction {
         }
         try {
             this.loc = loc;
-            this.mat = Material.valueOf(args[2]);
+            this.mat = Material.valueOf(args[2].toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ShowParseException(e.getMessage());
         }

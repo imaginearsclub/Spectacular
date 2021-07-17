@@ -45,7 +45,7 @@ public class FountainAction extends ShowAction {
             this.duration = duration;
             this.loc = loc;
             this.force = force;
-            this.mat = Material.valueOf(args[2]);
+            this.mat = Material.valueOf(args[2].toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ShowParseException(e.getMessage());
         }

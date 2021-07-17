@@ -38,7 +38,7 @@ public class BlockAction extends ShowAction {
             throw new ShowParseException("Invalid Location " + line);
         }
         try {
-            this.blockMat = Material.valueOf(args[2]);
+            this.blockMat = Material.valueOf(args[2].toUpperCase());
             this.location = loc;
         } catch (IllegalArgumentException e) {
             throw new ShowParseException(e.getMessage());

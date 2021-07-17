@@ -102,12 +102,7 @@ public class FountainSequence extends ShowSequence {
                             continue;
                         }
                         try {
-                            String[] list = args[2].split(":");
-                            if (list.length == 1) {
-                                data = new MaterialData(ShowUtil.convertMaterialNoData(Integer.parseInt(list[0])));
-                            } else {
-                                data = new MaterialData(ShowUtil.convertMaterial(Integer.parseInt(list[0]), Byte.parseByte(list[1])));
-                            }
+                            data = new MaterialData(Material.valueOf(args[2].toUpperCase()));
                         } catch (Exception e) {
                            Bukkit.getLogger().info("Show Parser " + " Error parsing id:data for " + args[2]);
                             data = new MaterialData(Material.GLASS);

@@ -3,7 +3,6 @@ package network.palace.show.sequence.fountain;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.sequence.ShowSequence;
-import network.palace.show.utils.ShowUtil;
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
 
@@ -32,11 +31,10 @@ public class FountainBlockSequence extends ShowSequence {
 
     @Override
     public ShowSequence load(String line, String... args) throws ShowParseException {
-        String[] list = args[2].split(":");
-        if (list.length == 1) {
-            data = new MaterialData(ShowUtil.convertMaterialNoData(Integer.parseInt(list[0])));
-        } else {
-            data = new MaterialData(ShowUtil.convertMaterial(Integer.parseInt(list[0]), Byte.parseByte(list[1])));
+        try {
+            data = new MaterialData(Material.valueOf(args[2].toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new ShowParseException(e.getMessage());
         }
         return this;
     }
