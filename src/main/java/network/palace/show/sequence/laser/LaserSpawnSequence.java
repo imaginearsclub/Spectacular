@@ -26,7 +26,7 @@ public class LaserSpawnSequence extends ShowSequence {
     public boolean run() {
         if (parent.isSpawned()) return true;
         try {
-            parent.spawn(loc, loc2);
+            parent.spawn();
         } catch (ShowParseException e) {
             Bukkit.getLogger().warning("Error on Spawn action for Laser Sequence Cause: " + e.getReason());
             ShowUtil.logDebug(show.getName(), "Error on Spawn action for Laser Sequence Cause: " + e.getReason());

@@ -19,7 +19,6 @@ import java.util.LinkedList;
  * @since 8/2/17
  */
 public class LaserSequence extends ShowSequence {
-    protected SequenceState state = null;
     @Getter private long startTime;
     private LinkedList<ShowSequence> sequences;
     @Getter private Laser.GuardianLaser laser = null;
@@ -42,7 +41,7 @@ public class LaserSequence extends ShowSequence {
         return false;
     }
 
-    protected void spawn(Location source, Location target) throws ShowParseException {
+    protected void spawn() throws ShowParseException {
         if (isSpawned()) return;
         try {
             laser = new Laser.GuardianLaser(source, target, -1, 100);
@@ -74,6 +73,7 @@ public class LaserSequence extends ShowSequence {
             FileInputStream fstream = new FileInputStream(file);
             DataInputStream in = new DataInputStream(fstream);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            Boolean firstLine = false;
             // Parse Lines
             while ((strLine = br.readLine()) != null) {
                 if (strLine.length() == 0 || strLine.startsWith("#")) continue;
@@ -83,17 +83,14 @@ public class LaserSequence extends ShowSequence {
                     continue;
                 }
                 // Make sure first line is the Sequence line
-                if (!args[0].equalsIgnoreCase("Sequence") && state == null) {
+                if (!args[0].equalsIgnoreCase("Sequence") && !firstLine) {
                     throw new ShowParseException("First line isn't Sequence definition");
                 }
-                if (args[0].equalsIgnoreCase("Sequence") && state == null) {
+                if (args[0].equalsIgnoreCase("Sequence") && !firstLine) {
                     if (!args[1].equalsIgnoreCase("Laser")) {
                         throw new ShowParseException("This isn't a Laser file!");
                     }
-                    state = SequenceState.fromString(args[2]);
-                    if (state == null) {
-                        throw new ShowParseException("Unknown Laser Sequence State " + args[2]);
-                    }
+                    firstLine = true;
                     continue;
                 }
                 String[] timeToks = args[0].split("_");
