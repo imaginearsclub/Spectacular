@@ -17,6 +17,8 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -138,5 +140,16 @@ public class ShowPlugin extends JavaPlugin {
 
     public static void stopShow(String name) {
         shows.remove(name);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().hasPermission("show.main")) {
+            new UpdateUtil(this, 94141).getVersion(v -> {
+                if (!this.getDescription().getVersion().equalsIgnoreCase(v)) {
+                    event.getPlayer().sendMessage(ChatColor.AQUA + "[Show] " + ChatColor.RED + "A New update is available for Show! It is always recommended that you upgrade! Link: https://www.spigotmc.org/resources/show-make-huge-spectaculars-in-minecraft.94141/");
+                }
+            });
+        }
     }
 }

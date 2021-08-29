@@ -2,6 +2,7 @@ package network.palace.show.sequence.laser;
 
 import network.palace.show.Show;
 import network.palace.show.beam.beam.Beam;
+import network.palace.show.beam.beam.Laser;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.sequence.ShowSequence;
 import network.palace.show.sequence.handlers.LaserObject;
@@ -30,34 +31,20 @@ public class LaserMoveSequence extends ShowSequence {
     @Override
     public boolean run() {
         if (!parent.isSpawned()) return true;
-        Beam beam = parent.getBeam();
-        if (beam == null || !beam.isActive()) return true;
+        Laser.GuardianLaser laser = parent.getLaser();
+        if (laser == null || !laser.isStarted()) return true;
         Location loc;
         switch (object) {
             case SOURCE:
-                loc = beam.getSource();
+                loc = laser.getStart();
                 break;
             case TARGET:
-                loc = beam.getTarget();
+                loc = laser.getEnd();
                 break;
             default:
                 return true;
         }
         if (startTime == 0) {
-            switch (parent.state) {
-                case RELATIVE:
-                    change = target.toVector();
-                    break;
-                case ACTUAL: {
-                    change = new Vector(target.getX() - loc.getX(), target.getY() - loc.getY(), target.getZ() - loc.getZ());
-                    break;
-                }
-                default:
-                    return true;
-            }
-            if (duration != 0) {
-                change.divide(new Vector(duration, duration, duration));
-            }
             startTime = System.currentTimeMillis();
         }
 
@@ -65,10 +52,10 @@ public class LaserMoveSequence extends ShowSequence {
 
         switch (object) {
             case SOURCE:
-                beam.setSource(loc.add(change));
+                laser.moveStart(target, duration, null);
                 break;
             case TARGET:
-                beam.setTarget(loc.add(change));
+                laser.moveEnd(target, duration, null);
                 break;
         }
 

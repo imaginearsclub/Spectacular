@@ -2,7 +2,8 @@ package network.palace.show.sequence.laser;
 
 import lombok.Getter;
 import network.palace.show.Show;
-import network.palace.show.beam.beam.Beam;
+import network.palace.show.ShowPlugin;
+import network.palace.show.beam.beam.Laser;
 import network.palace.show.exceptions.ShowParseException;
 import network.palace.show.sequence.ShowSequence;
 import network.palace.show.sequence.handlers.SequenceState;
@@ -21,9 +22,9 @@ public class LaserSequence extends ShowSequence {
     protected SequenceState state = null;
     @Getter private long startTime;
     private LinkedList<ShowSequence> sequences;
-    @Getter private Beam beam = null;
-    private Location relativeBaseSpawn = null;
-    private Location relativeTargetSpawn = null;
+    @Getter private Laser.GuardianLaser laser = null;
+    private Location source = null;
+    private Location target = null;
 
     public LaserSequence(Show show, long time) {
         super(show, time);
@@ -41,38 +42,24 @@ public class LaserSequence extends ShowSequence {
         return false;
     }
 
-    protected void spawn(Location loc) throws ShowParseException {
-        spawn(loc, loc);
-    }
-
     protected void spawn(Location source, Location target) throws ShowParseException {
         if (isSpawned()) return;
-        if (state.equals(SequenceState.RELATIVE)) {
-            if (relativeBaseSpawn == null) {
-                beam = new Beam(target, source);
-            } else if (source != null) {
-                beam = new Beam(relativeBaseSpawn, source);
-            } else if (relativeTargetSpawn == null) {
-                beam = new Beam(relativeBaseSpawn, relativeBaseSpawn);
-            } else {
-                beam = new Beam(relativeBaseSpawn, relativeTargetSpawn);
-            }
-        } else {
-            if (source == null && target == null) {
-                throw new ShowParseException("Sequence is ACTUAL type and no spawn locations were provided!");
-            }
-            beam = new Beam(target, source);
+        try {
+            laser = new Laser.GuardianLaser(source, target, -1, 100);
+            laser.start(ShowPlugin.getInstance());
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+            throw new ShowParseException("Error Creating Sequence. Check logs and send to the developers");
         }
-        beam.start();
     }
 
     public void despawn() {
-        if (!isSpawned() || beam == null) return;
-        beam.stop();
+        if (!isSpawned() || laser == null) return;
+        laser.stop();
     }
 
     public boolean isSpawned() {
-        return beam != null && beam.isActive();
+        return laser != null && laser.isStarted();
     }
 
     @Override
@@ -139,9 +126,9 @@ public class LaserSequence extends ShowSequence {
             throw new ShowParseException("Error while parsing Sequence " + showArgs[3] + " on Line [" + strLine + "]");
         }
         if (showArgs.length > 4) {
-            relativeBaseSpawn = WorldUtil.strToLoc(show.getWorld().getName() + "," + showArgs[4]);
+            source = WorldUtil.strToLoc(show.getWorld().getName() + "," + showArgs[4]);
             if (showArgs.length > 5) {
-                relativeTargetSpawn = WorldUtil.strToLoc(show.getWorld().getName() + "," + showArgs[5]);
+                target = WorldUtil.strToLoc(show.getWorld().getName() + "," + showArgs[5]);
             }
         }
         this.sequences = sequences;
