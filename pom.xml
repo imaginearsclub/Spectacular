@@ -6,7 +6,7 @@
 
     <groupId>network.palace</groupId>
     <artifactId>Show</artifactId>
-    <version>1.5.7</version>
+    <version>1.5.8</version>
     <repositories>
         <repository>
             <id>enginehub-maven</id>
@@ -37,8 +37,8 @@
         </dependency>
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib-API</artifactId>
-            <version>4.4.0</version>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
