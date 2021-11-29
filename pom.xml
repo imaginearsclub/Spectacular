@@ -6,7 +6,7 @@
 
     <groupId>network.palace</groupId>
     <artifactId>Show</artifactId>
-    <version>1.5.8</version>
+    <version>1.6.0</version>
     <repositories>
         <repository>
             <id>enginehub-maven</id>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>1.18.20</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>6.1.4-SNAPSHOT</version>
+            <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

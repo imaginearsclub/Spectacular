@@ -16,6 +16,7 @@ import network.palace.show.utils.UpdateUtil;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -26,6 +27,9 @@ import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.plugin.*;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +37,7 @@ import java.util.Map;
  * Created by Marc on 12/6/16.
  * Updated to be Core free by Tom 07/10/2021
  */
-@Plugin(name = "Show", version = "1.5.8")
+@Plugin(name = "Show", version = "1.6.0")
 @Description(value = "Create Shows in Minecraft with easy to use files!")
 @LoadOrder(value = PluginLoadOrder.POSTWORLD)
 @Author(value = "Legobuilder0813")
@@ -47,7 +51,7 @@ import java.util.Map;
 @ApiVersion(value = ApiVersion.Target.v1_13)
 @Command(name = "show", desc = "Main show command", permission = "show.main", permissionMessage = "You do not have permission!", usage = "/show [list|start|stop]")
 @Command(name = "showdebug", desc = "Showdebug command", permission = "show.debug", permissionMessage = "You do not have permission!", usage = "/showdebug")
-
+@Command(name = "showgen", desc = "Showgen commands", permission = "show.showgen", permissionMessage = "You do not have permission!", usage = "/showgen")
 public class ShowPlugin extends JavaPlugin {
     @Getter private ArmorStandManager armorStandManager;
     @Getter private FountainManager fountainManager;
@@ -57,6 +61,8 @@ public class ShowPlugin extends JavaPlugin {
     @Getter private final boolean isMinecraftGreaterOrEqualTo11_2 = MinecraftVersion.getCurrentVersion().getMinor() >= 12;
     @Getter private static AudioApi audioApi;
     @Getter private static OpenAudioMcSpigot openAudioMcSpigot;
+    @Getter private String githubToken;
+    @Getter private String serverIp;
     private static ShowPlugin instance;
     private static final HashMap<String, Show> shows = new HashMap<>();
 
@@ -71,7 +77,6 @@ public class ShowPlugin extends JavaPlugin {
         instance = this;
         armorStandManager = new ArmorStandManager();
         fountainManager = new FountainManager();
-        showGenerator = new ShowGenerator();
         buildUtil = new BuildUtil();
         softNPCManager = new SoftNPCManager();
         audioApi = AudioApi.getInstance();
@@ -79,6 +84,28 @@ public class ShowPlugin extends JavaPlugin {
         FileUtil.setupFiles();
         this.getCommand("show").setExecutor(new ShowCommand());
         this.getCommand("showdebug").setExecutor(new ShowDebugCommand());
+
+        FileConfiguration config = this.getConfig();
+        this.saveDefaultConfig();
+        if (config.getString("github.token") != null) {
+            githubToken = config.getString("github.token");
+            this.getCommand("showgen").setExecutor(new ShowgenCommand());
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Showgen has been enabled in show!");
+        } else {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Show] Showgen will not be running in Show! To enable it, add a github token to the config!");
+        }
+        try {
+            URL whatismyip = new URL("http://checkip.amazonaws.com");
+            BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+            serverIp = in.readLine();
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("Show could not obtain this machines IP. This is only used when generating gists so not essential");
+        }
+
+
+        //has to be loaded after github token
+        showGenerator = new ShowGenerator();
+
 
         this.getServer().getPluginManager().registerEvents(fountainManager, this);
         this.getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
@@ -101,12 +128,12 @@ public class ShowPlugin extends JavaPlugin {
 
         new UpdateUtil(this, 94141).getVersion(v -> {
             if (!this.getDescription().getVersion().equalsIgnoreCase(v)) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "A New update is available for Show! It is always recommended that you upgrade! Link: https://www.spigotmc.org/resources/show-make-huge-spectaculars-in-minecraft.94141/");
+                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Show] A New update is available for Show! It is always recommended that you upgrade! Link: https://www.spigotmc.org/resources/show-make-huge-spectaculars-in-minecraft.94141/");
             }
         });
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Show is now enabled!");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Show is now enabled!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
     }
 
     @Override
