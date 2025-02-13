@@ -1,13 +1,18 @@
 package network.palace.show.actions;
 
-import com.craftmend.openaudiomc.spigot.modules.regions.objects.TimedRegionProperties;
+import com.craftmend.openaudiomc.api.WorldApi;
+import com.craftmend.openaudiomc.api.exceptions.InvalidRegionException;
+import com.craftmend.openaudiomc.api.exceptions.InvalidThreadException;
+import com.craftmend.openaudiomc.api.exceptions.UnknownWorldException;
+import com.craftmend.openaudiomc.api.regions.RegionMediaOptions;
 import network.palace.show.Show;
-import network.palace.show.ShowPlugin;
 import network.palace.show.exceptions.ShowParseException;
-import network.palace.show.utils.MiscUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class AudioPlayRegionAction extends ShowAction {
+
     private String audioUrl;
     private Integer duration;
     private String regionName;
@@ -19,32 +24,76 @@ public class AudioPlayRegionAction extends ShowAction {
 
     @Override
     public void play(Player[] nearPlayers) {
-        TimedRegionProperties timedRegionProperties = new TimedRegionProperties(audioUrl, duration, regionName);
-        timedRegionProperties.setVolume(volume);
-        ShowPlugin.getOpenAudioMcSpigot().getRegionModule().registerRegion(regionName, timedRegionProperties);
-        ShowPlugin.getOpenAudioMcSpigot().getRegionModule().forceUpdateRegions();
+        // Get the world for the player(s) or some other source
+        World world = Bukkit.getWorld("world"); // Replace with your actual logic for retrieving the world
+        if (world == null) {
+            Bukkit.getLogger().severe("World 'world' does not exist! Cannot register region.");
+            return;
+        }
+
+        String worldName = world.getName(); // Get the world name
+
+        // Define audio options for the region
+        RegionMediaOptions options = new RegionMediaOptions(audioUrl);
+        options.setVolume(volume != null ? volume : 50); // Default volume to 50 if null
+
+        try {
+            // Register the region with the WorldApi
+            WorldApi.getInstance().registerRegion(worldName, regionName, options);
+            Bukkit.getLogger().info("Successfully registered audio region '" + regionName + "' in world '" + worldName + "'");
+        } catch (UnknownWorldException e) {
+            Bukkit.getLogger().severe("Failed to register region: Unknown world '" + worldName + "'");
+        } catch (InvalidThreadException e) {
+            Bukkit.getLogger().severe("Failed to register region: Invalid thread use! Ensure this is called on the main server thread.");
+        } catch (InvalidRegionException e) {
+            Bukkit.getLogger().severe("Failed to register region: Invalid region parameters for '" + regionName + "'");
+        }
+    }
+
+    // Validate the properties before registering the region
+    private void validateProperties() throws ShowParseException {
+        if (regionName == null || regionName.isBlank()) {
+            throw new ShowParseException("Region name cannot be null or empty.");
+        }
+        if (audioUrl == null || audioUrl.isBlank()) {
+            throw new ShowParseException("Audio URL cannot be null or empty.");
+        }
+        if (volume != null && (volume < 0 || volume > 100)) {
+            throw new ShowParseException("Volume must be between 0 and 100.");
+        }
+        if (duration != null && duration < 0) {
+            throw new ShowParseException("Duration cannot be negative.");
+        }
     }
 
     @Override
     public ShowAction load(String line, String... args) throws ShowParseException {
-        if (!ShowPlugin.getOpenAudioMcSpigot().getRegionModule().getRegionAdapter().doesRegionExist(args[2])) {
-            throw new ShowParseException("The specified worldguard region does not exist!");
+        // Example: audioRegion|region-name|https://example.com/audio.mp3|50|30
+        if (args.length < 3) {
+            throw new ShowParseException("Invalid number of arguments.");
         }
-        if (!MiscUtil.checkIfInt(args[3])) {
-            throw new ShowParseException("The duration provided is not an integer!");
-        }
-        if (!MiscUtil.checkIfInt(args[4])) {
-            throw new ShowParseException("The volume provided is not an integer!");
-        }
-        this.regionName = args[2];
-        this.duration = Integer.valueOf(args[3]);
-        this.volume = Integer.valueOf(args[4]);
-        this.audioUrl = args[5];
+
+        this.regionName = args[0];
+        this.audioUrl = args[1];
+
+        // Parse optional volume and duration
+        this.volume = args.length >= 3 ? Integer.parseInt(args[2]) : null;
+        this.duration = args.length >= 4 ? Integer.parseInt(args[3]) : null;
+
+        // Validate the provided properties
+        validateProperties();
+
         return this;
     }
 
     @Override
     protected ShowAction copy(Show show, long time) throws ShowParseException {
-        throw new ShowParseException("This action doesn't support repeating!");
+        AudioPlayRegionAction copy = new AudioPlayRegionAction(show, time);
+        copy.audioUrl = this.audioUrl;
+        copy.duration = this.duration;
+        copy.regionName = this.regionName;
+        copy.volume = this.volume;
+
+        return copy;
     }
 }
