@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import net.kyori.adventure.text.format.NamedTextColor;
 import network.palace.show.ShowPlugin;
 import network.palace.show.actions.FakeBlockAction;
 import network.palace.show.generator.GeneratorSession;
@@ -24,9 +25,9 @@ public class GenerateCommand {
         Player player = (Player) sender;
         GeneratorSession session = ShowPlugin.getShowGenerator().getOrCreateSession(player.getUniqueId());
         if (args.length < 2 || args.length == 3 || args.length > 4) {
-            player.sendMessage(ChatColor.RED + "/showgen generate [action] [timestamp]");
-            player.sendMessage(ChatColor.RED + "OR");
-            player.sendMessage(ChatColor.RED + "/showgen generate [action] [bottom/top] [delay per layer] [timestamp]");
+            player.sendMessage(NamedTextColor.RED + "/showgen generate [action] [timestamp]");
+            player.sendMessage(NamedTextColor.RED + "OR");
+            player.sendMessage(NamedTextColor.RED + "/showgen generate [action] [bottom/top] [delay per layer] [timestamp]");
             return;
         }
 
