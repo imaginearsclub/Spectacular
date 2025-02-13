@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Marc on 10/11/15
  */
-public class ShowStand {
+public class ShowStand implements Cloneable {
     @Getter private String id;
     @Getter private boolean small;
     @Getter private ArmorData armorData;
@@ -46,5 +46,17 @@ public class ShowStand {
 
     public void despawn() {
         hasSpawned = false;
+    }
+
+    @Override
+    public ShowStand clone() {
+        try {
+            ShowStand cloned = (ShowStand) super.clone();
+            // Perform deep copying if necessary for mutable fields
+            cloned.stand = null; // Avoid copying ArmorStand reference (optional)
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // This can't happen if implementing Cloneable
+        }
     }
 }
