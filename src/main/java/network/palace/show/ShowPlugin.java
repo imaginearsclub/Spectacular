@@ -2,10 +2,13 @@ package network.palace.show;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.utility.MinecraftVersion;
-import com.craftmend.openaudiomc.api.interfaces.AudioApi;
+import com.craftmend.openaudiomc.api.MediaApi;
 import com.craftmend.openaudiomc.spigot.OpenAudioMcSpigot;
 import lombok.Getter;
-import network.palace.show.commands.*;
+import net.kyori.adventure.text.format.NamedTextColor;
+import network.palace.show.commands.ShowCommand;
+import network.palace.show.commands.ShowDebugCommand;
+import network.palace.show.commands.ShowgenCommand;
 import network.palace.show.generator.ShowGenerator;
 import network.palace.show.listeners.ChunkListener;
 import network.palace.show.listeners.PlayerInteract;
@@ -32,13 +35,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by Marc on 12/6/16.
- * Updated to be Core free by Tom 07/10/2021
- */
 @Plugin(name = "Show", version = "1.6.0")
-@Description(value = "Create Shows in Minecraft with easy to use files!")
+@Description(value = "Create Shows in Minecraft with easy-to-use files!")
 @LoadOrder(value = PluginLoadOrder.POSTWORLD)
 @Author(value = "Legobuilder0813")
 @Author(value = "Parker")
@@ -53,20 +53,22 @@ import java.util.Map;
 @Command(name = "showdebug", desc = "Showdebug command", permission = "show.debug", permissionMessage = "You do not have permission!", usage = "/showdebug")
 @Command(name = "showgen", desc = "Showgen commands", permission = "show.showgen", permissionMessage = "You do not have permission!", usage = "/showgen")
 public class ShowPlugin extends JavaPlugin {
+
     @Getter private ArmorStandManager armorStandManager;
     @Getter private FountainManager fountainManager;
     @Getter private static ShowGenerator showGenerator;
     @Getter private static BuildUtil buildUtil;
     @Getter private static SoftNPCManager softNPCManager;
     @Getter private final boolean isMinecraftGreaterOrEqualTo11_2 = MinecraftVersion.getCurrentVersion().getMinor() >= 12;
-    @Getter private static AudioApi audioApi;
+    @Getter private static MediaApi mediaApi;
     @Getter private static OpenAudioMcSpigot openAudioMcSpigot;
     @Getter private String githubToken;
     @Getter private String serverIp;
-    private static ShowPlugin instance;
-    private static final HashMap<String, Show> shows = new HashMap<>();
 
-    private int taskid = 0;
+    private static ShowPlugin instance;
+    private static final Map<String, Show> shows = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> debugMap = new ConcurrentHashMap<>();
+    private int taskid;
 
     public static ShowPlugin getInstance() {
         return instance;
@@ -75,108 +77,118 @@ public class ShowPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        getSLF4JLogger().info("Enabling Show plugin...");
+
+        // Initialize managers
         armorStandManager = new ArmorStandManager();
         fountainManager = new FountainManager();
         buildUtil = new BuildUtil();
         softNPCManager = new SoftNPCManager();
-        audioApi = AudioApi.getInstance();
-        openAudioMcSpigot = OpenAudioMcSpigot.getInstance();
+
+        // Initialize dependencies
+        try {
+            mediaApi = MediaApi.getInstance();
+            openAudioMcSpigot = OpenAudioMcSpigot.getInstance();
+            if (mediaApi == null || openAudioMcSpigot == null) {
+                throw new IllegalStateException("MediaApi or OpenAudioMcSpigot are not properly initialized!");
+            }
+        } catch (Exception e) {
+            getSLF4JLogger().error("Failed to initialize dependencies: {}", e.getMessage(), e);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Setup files
         FileUtil.setupFiles();
+
+        // Setup commands
         this.getCommand("show").setExecutor(new ShowCommand());
         this.getCommand("showdebug").setExecutor(new ShowDebugCommand());
 
         FileConfiguration config = this.getConfig();
         this.saveDefaultConfig();
+
         if (config.getString("github.token") != null) {
             githubToken = config.getString("github.token");
             this.getCommand("showgen").setExecutor(new ShowgenCommand());
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Showgen has been enabled in show!");
+            getSLF4JLogger().info("{}[Show] Showgen has been enabled in show!", NamedTextColor.GREEN);
         } else {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Show] Showgen will not be running in Show! To enable it, add a github token to the config!");
+            getSLF4JLogger().warn("{}[Show] Showgen will not be running in Show! To enable it, add a github token to the config!", NamedTextColor.RED);
         }
-        try {
-            URL whatismyip = new URL("http://checkip.amazonaws.com");
-            BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+
+        // Get server IP address (optional)
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://checkip.amazonaws.com").openStream()))) {
             serverIp = in.readLine();
         } catch (Exception e) {
-            Bukkit.getLogger().warning("Show could not obtain this machines IP. This is only used when generating gists so not essential");
+            getSLF4JLogger().warn("Could not obtain server IP. This feature is only used for Gist generation.");
         }
 
-
-        //has to be loaded after github token
+        // Initialize Show Generator
         showGenerator = new ShowGenerator();
 
+        // Register events
+        getServer().getPluginManager().registerEvents(fountainManager, this);
+        getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
+        getServer().getPluginManager().registerEvents(new ChunkListener(), this);
 
-        this.getServer().getPluginManager().registerEvents(fountainManager, this);
-        this.getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
-        this.getServer().getPluginManager().registerEvents(new ChunkListener(), this);
+        // Schedule Show Ticker
+        taskid = getServer().getScheduler().runTaskTimer(this, this::tickShows, 0L, 20L).getTaskId();
 
-        // Show Ticker
-        taskid = Bukkit.getScheduler().runTaskTimer(this, () -> {
-            for (Map.Entry<String, Show> entry : new HashMap<>(shows).entrySet()) {
-                Show show = entry.getValue();
-                if (show.update()) {
-                    show.stop();
-                    shows.remove(entry.getKey());
-                }
-            }
-        }, 0L, 1L).getTaskId();
-
-        int pluginId = 12010;
-
-        Metrics metrics = new Metrics(this, pluginId);
-
-        new UpdateUtil(this, 94141).getVersion(v -> {
-            if (!this.getDescription().getVersion().equalsIgnoreCase(v)) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[Show] A New update is available for Show! It is always recommended that you upgrade! Link: https://www.spigotmc.org/resources/show-make-huge-spectaculars-in-minecraft.94141/");
-            }
-        });
-
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Show is now enabled!");
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Show] Huge shoutout to Legobuilder0813 for making this work for The Palace Network. Time to let your awesome code shine");
+        getSLF4JLogger().info("{}[Show] Plugin enabled successfully!", NamedTextColor.GREEN);
     }
 
     @Override
     public void onDisable() {
-        ProtocolLibrary.getProtocolManager().removePacketListeners(this);
-        int size = shows.size();
-        if (size > 0) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.hasPermission("shows.main") | p.isOp()) {
-                    p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Reloading Show plugin, there are currently " +
-                            size + " shows running!");
-                }
-            }
+        getSLF4JLogger().info("{}[Show] Disabling Show plugin...", NamedTextColor.RED);
+
+        // Cancel scheduler tasks
+        if (taskid != 0) {
+            getServer().getScheduler().cancelTask(taskid);
         }
-        Bukkit.getScheduler().cancelTask(taskid);
-        for (Show s : shows.values()) {
-            s.stop();
+
+        // Remove protocol listeners
+        ProtocolLibrary.getProtocolManager().removePacketListeners(this);
+
+        // Stop all running shows
+        for (Show show : shows.values()) {
+            show.stop();
         }
         shows.clear();
+
+        getSLF4JLogger().info("{}[Show] Plugin disabled successfully.", NamedTextColor.RED);
     }
 
-    public static HashMap<String, Show> getShows() {
-        return new HashMap<>(shows);
+    private void tickShows() {
+        for (Map.Entry<String, Show> entry : new HashMap<>(shows).entrySet()) {
+            Show show = entry.getValue();
+            if (show.update()) {
+                show.stop();
+                shows.remove(entry.getKey());
+            }
+        }
     }
-
-    public static HashMap<String, Boolean> debugMap = new HashMap<String, Boolean>();
 
     public static void startShow(String name, Show show) {
+        if (shows.containsKey(name)) {
+            Bukkit.getLogger().warning("[Show] Show '" + name + "' already exists and will be overwritten.");
+        }
         shows.put(name, show);
+        Bukkit.getLogger().info("[Show] Show '" + name + "' started.");
     }
 
     public static void stopShow(String name) {
-        shows.remove(name);
+        if (shows.remove(name) != null) {
+            Bukkit.getLogger().info("[Show] Show '" + name + "' stopped.");
+        } else {
+            Bukkit.getLogger().warning("[Show] Attempted to stop non-existent show: " + name);
+        }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (event.getPlayer().hasPermission("show.main")) {
-            new UpdateUtil(this, 94141).getVersion(v -> {
-                if (!this.getDescription().getVersion().equalsIgnoreCase(v)) {
-                    event.getPlayer().sendMessage(ChatColor.AQUA + "[Show] " + ChatColor.RED + "A New update is available for Show! It is always recommended that you upgrade! Link: https://www.spigotmc.org/resources/show-make-huge-spectaculars-in-minecraft.94141/");
-                }
-            });
+        Player player = event.getPlayer();
+        if (player.hasPermission("show.main")) {
         }
     }
 }
