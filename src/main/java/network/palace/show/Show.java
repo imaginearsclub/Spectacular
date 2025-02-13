@@ -70,6 +70,10 @@ public class Show {
                 .filter(tp -> tp.getLocation().distance(location) <= radius).map(Player::getUniqueId).collect(Collectors.toList()));
     }
 
+    public ArmorStandManager getArmorStandManager() {
+        return ShowPlugin.getPlugin().getArmorStandManager();
+    }
+
     private void addAction(ShowAction newAction) {
         if (firstAction == null) {
             firstAction = newAction;
