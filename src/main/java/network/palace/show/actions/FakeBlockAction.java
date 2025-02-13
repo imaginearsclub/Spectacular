@@ -4,73 +4,100 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import lombok.Getter;
 import lombok.Setter;
-import network.palace.show.packets.server.block.WrapperPlayServerBlockChange;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
-import network.palace.show.handlers.BlockData;
+import network.palace.show.packets.server.block.WrapperPlayServerBlockChange;
 import network.palace.show.utils.MiscUtil;
-import network.palace.show.utils.ShowUtil;
 import network.palace.show.utils.WorldUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by Marc on 7/1/15
- */
+import javax.annotation.Nullable;
+
 @Getter
 @Setter
 @SuppressWarnings("deprecation")
 public class FakeBlockAction extends ShowAction {
-    private Location loc;
-    private Material mat;
+    private Location location;
+    private Material material;
 
     public FakeBlockAction(Show show, long time) {
-        super(show, time);
+        super(show, time, null, null);
     }
 
-    public FakeBlockAction(Show show, long time, Location loc, Material mat) {
+    public FakeBlockAction(@NotNull Show show, long time, @Nullable Location location, @Nullable Material material) {
         super(show, time);
-        this.loc = loc;
-        this.mat = mat;
+        this.location = location;
+        this.material = material;
     }
 
     @Override
     public void play(Player[] nearPlayers) {
+        if (location == null || material == null) {
+            Bukkit.getLogger().warning("FakeBlockAction: Cannot play action as Location or Material is null.");
+            return;
+        }
+
         try {
-            WrapperPlayServerBlockChange p = new WrapperPlayServerBlockChange();
-            p.setLocation(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-            p.setBlockData(WrappedBlockData.createData(mat));
-            for (Player tp : nearPlayers) {
-                if (tp != null) MiscUtil.sendPacket(p, tp);
+            WrapperPlayServerBlockChange packet = createBlockChangePacket(location, material);
+
+            for (Player player : nearPlayers) {
+                if (player != null) {
+                    sendPacketToPlayer(packet, player);
+                }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe("FakeBlockAction -" + ChatColor.RED + "Error sending FakeBlockAction for type (" +
-                    mat.toString() + ") at location " + loc.getX() + "," + loc.getY() + "," + loc.getZ() + " at time " +
-                    time + " for show " + show.getName());
-            e.printStackTrace();
+            logErrorWithLocation(e);
         }
+    }
+
+    private WrapperPlayServerBlockChange createBlockChangePacket(Location location, Material material) {
+        WrapperPlayServerBlockChange packet = new WrapperPlayServerBlockChange();
+        packet.setLocation(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        packet.setBlockData(WrappedBlockData.createData(material));
+        return packet;
+    }
+
+    private void sendPacketToPlayer(WrapperPlayServerBlockChange packet, Player player) {
+        try {
+            MiscUtil.sendPacket(packet, player);
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("Failed to send packet to player " + player.getName() + ": " + ex.getMessage());
+        }
+    }
+
+    private void logErrorWithLocation(Exception e) {
+        String locationInfo = location != null ? location.getX() + "," + location.getY() + "," + location.getZ() : "unknown";
+        Bukkit.getLogger().severe("FakeBlockAction: Error in Material (" + material + ") at Location: " + locationInfo +
+                " | Time: " + time + " | Show: " + show.getName());
+        e.printStackTrace();
     }
 
     @Override
     public ShowAction load(String line, String... args) throws ShowParseException {
-        Location loc = WorldUtil.strToLoc(show.getWorld().getName() + "," + args[3]);
-        if (loc == null) {
-            throw new ShowParseException("Invalid Location " + line);
+        if (args.length < 4) {
+            throw new ShowParseException("Insufficient arguments for FakeBlockAction: " + line);
         }
+
         try {
-            this.loc = loc;
-            this.mat = Material.valueOf(args[2].toUpperCase());
+            Material material = Material.valueOf(args[2].toUpperCase());
+            Location location = WorldUtil.strToLoc(show.getWorld().getName() + "," + args[3]);
+
+            if (location == null) {
+                throw new ShowParseException("Invalid Location provided in: " + line);
+            }
+            return new FakeBlockAction(show, time, location, material);
+
         } catch (IllegalArgumentException e) {
-            throw new ShowParseException(e.getMessage());
+            throw new ShowParseException("Invalid Material or Location: " + e.getMessage());
         }
-        return this;
     }
 
     @Override
     protected ShowAction copy(Show show, long time) throws ShowParseException {
-        return new FakeBlockAction(show, time, loc, mat);
+        return new FakeBlockAction(show, time, location, material);
     }
 }
