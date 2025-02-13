@@ -2,7 +2,6 @@ package network.palace.show;
 
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -12,19 +11,20 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.util.io.Closer;
 import network.palace.show.utils.ShowUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.Objects;
 
 @SuppressWarnings("deprecation")
+/**
+ * Manager responsible for handling terrain and schematic operations using WorldEdit for a Paper server.
+ */
 public class TerrainManager {
     private final LocalSession localSession;
     private final EditSession editSession;
@@ -38,24 +38,29 @@ public class TerrainManager {
      * @param player the player to work with
      */
     public TerrainManager(WorldEditPlugin wep, Player player) {
-        LocalSession worldEditSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
-        we = wep.getWorldEdit();
-        localSession = worldEditSession;
-        localPlayer = player;
-        editSession = worldEditSession.createEditSession(BukkitAdapter.adapt(player));
+        Objects.requireNonNull(wep, "WorldEdit plugin cannot be null");
+        Objects.requireNonNull(player, "Player cannot be null");
+
+        this.we = wep.getWorldEdit();
+        this.localPlayer = player;
+        this.localSession = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
+        this.editSession = localSession.createEditSession(BukkitAdapter.adapt(player));
     }
 
     /**
-     * Constructor
+     * Constructor for TerrainManager to work within a specific world.
      *
      * @param wep   the WorldEdit plugin instance
      * @param world the world to work in
      */
-    public TerrainManager(WorldEditPlugin wep, World world) {
-        we = wep.getWorldEdit();
-        localPlayer = null;
-        localSession = new LocalSession(we.getConfiguration());
-        editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world));
+    public TerrainManager(WorldEditPlugin wep, World world){
+        Objects.requireNonNull(wep, "WorldEdit plugin cannot be null");
+        Objects.requireNonNull(world, "World cannot be null");
+
+        this.we = wep.getWorldEdit();
+        this.localPlayer = null;
+        this.localSession = new LocalSession(we.getConfiguration());
+        this.editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(world));
     }
 
     /**
@@ -67,52 +72,107 @@ public class TerrainManager {
      * @param l2       the corner of the region to save, opposite to l1
      */
     public void saveTerrain(File saveFile, Location l1, Location l2) throws WorldEditException, IOException {
+        validateLocations(l1, l2);
+
+        // Calculate the minimum and maximum points of the region
         BlockVector3 min = getMin(l1, l2);
         BlockVector3 max = getMax(l1, l2);
 
-        saveFile = we.getSafeSaveFile(BukkitAdapter.adapt(localPlayer), saveFile.getParentFile(), saveFile.getName(), ".schematic", ".schematic");
+        File safeFile = we.getSafeSaveFile(BukkitAdapter.adapt(localPlayer), saveFile.getParentFile(), saveFile.getName(), ".schematic", ".schematic");
 
         CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(Objects.requireNonNull(l1.getWorld())), min, max);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
 
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(region.getWorld(), -1);
+        // Perform the copy operation using auto-closing edit session
+        try (EditSession editSession = we.getInstance().getEditSessionFactory().getEditSession(region.getWorld(), -1)) {
+            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+            copy.setCopyingEntities(true);
+            Operations.complete(copy);
+        }
 
-        ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-        forwardExtentCopy.setCopyingEntities(true);
-        Operations.complete(forwardExtentCopy);
-        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(saveFile))) {
+        // Write schematic to file
+        try (ClipboardWriter writer = ClipboardFormats.findByAlias("sponge").getWriter(new FileOutputStream(safeFile))) {
             writer.write(clipboard);
         }
     }
 
-    public void loadSchematic(WorldEditPlugin wep, String fileName, Location loc, boolean noAir) throws Exception {
-        File f = wep.getWorldEdit().getSafeOpenFile(null, new File("plugins/WorldEdit/schematics"), fileName,
-                "schematic", "schematic");
-        if (!f.exists()) {
+    /**
+     * Load a schematic file and paste it at the specified location.
+     *
+     * @param wep the WorldEdit plugin instance
+     * @param fileName        the name of the schematic file
+     * @param loc             the location to paste the schematic
+     * @param ignoreAirBlocks whether to ignore air blocks while pasting
+     * @throws Exception if an error occurs during loading or pasting
+     */
+    public void loadSchematic(WorldEditPlugin wep, String fileName, Location loc, boolean ignoreAirBlocks) throws Exception {
+        Objects.requireNonNull(wep, "WorldEdit plugin cannot be null");
+        Objects.requireNonNull(fileName, "Schematic file name cannot be null");
+        Objects.requireNonNull(loc, "Location cannot be null");
+
+        Path schematicDir = Path.of("plugins", "WorldEdit", "schematics");
+        File schematicFile = wep.getWorldEdit().getSafeOpenFile(null, schematicDir.toFile(), fileName, "schematic", "schematic");
+
+        if (!schematicFile.exists()) {
             ShowUtil.logDebug("Schematics", "Tried to load Schematic " + fileName + " but does not exist!");
             return;
         }
-        ClipboardFormat format = ClipboardFormats.findByFile(f);
-        try (ClipboardReader reader = format.getReader(new FileInputStream(f))) {
+
+        ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+        if (format == null) {
+            throw new IllegalArgumentException("Unknown schematic format for file: " + fileName);
+        }
+        try (
+                FileInputStream fis = new FileInputStream(schematicFile);
+                ClipboardReader reader = format.getReader(fis);
+        ) {
             Clipboard clipboard = reader.read();
             localSession.setClipboard(new ClipboardHolder(clipboard));
-            Region region = clipboard.getRegion();
-            BlockVector3 to = BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
-            Operation operation = localSession.getClipboard().createPaste(editSession).to(to).ignoreAirBlocks(noAir).build();
+
+            BlockVector3 destination = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+            Operation operation = localSession.getClipboard().createPaste(editSession)
+                    .to(destination)
+                    .ignoreAirBlocks(ignoreAirBlocks)
+                    .build();
             Operations.completeLegacy(operation);
         }
     }
 
-    public void loadSchematic(WorldEditPlugin wep, String fileName, boolean noAir) throws Exception {
-        loadSchematic(wep, fileName, null, noAir);
+    /**
+     * Validates that the given locations and their associated worlds are not null.
+     *
+     * @param l1 the first location to validate, must not be null
+     * @param l2 the second location to validate, must not be null
+     */
+    private void validateLocations(Location l1, Location l2) {
+        Objects.requireNonNull(l1, "Location 1 cannot be null");
+        Objects.requireNonNull(l2, "Location 2 cannot be null");
+        Objects.requireNonNull(l1.getWorld(), "Location 1 world cannot be null");
+        Objects.requireNonNull(l2.getWorld(), "Location 2 world cannot be null");
     }
 
-    private BlockVector3 getMin(Location l1, Location l2) {
+        /**
+         * Calculates the minimum corner of a cuboid region defined by two locations.
+         *
+         * @param l1 the first location
+         * @param l2 the second location
+         * @return a BlockVector3 representing the minimum corner calculated
+         *         by taking the smallest x, y, and z values from the two locations
+         */
+        private BlockVector3 getMin(Location l1, Location l2) {
         return BlockVector3.at(Math.min(l1.getBlockX(), l2.getBlockX()), Math.min(l1.getBlockY(), l2.getBlockY()),
                 Math.min(l1.getBlockZ(), l2.getBlockZ())
         );
     }
 
+    /**
+     * Calculates the maximum corner of a cuboid region defined by two locations.
+     *
+     * @param l1 the first location
+     * @param l2 the second location
+     * @return a BlockVector3 representing the maximum corner calculated
+     *         by taking the largest x, y, and z values from the two locations
+     */
     private BlockVector3 getMax(Location l1, Location l2) {
         return BlockVector3.at(Math.max(l1.getBlockX(), l2.getBlockX()), Math.max(l1.getBlockY(), l2.getBlockY()),
                 Math.max(l1.getBlockZ(), l2.getBlockZ())
