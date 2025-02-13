@@ -1,7 +1,5 @@
 package network.palace.show.actions;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import network.palace.show.Show;
 import network.palace.show.exceptions.ShowParseException;
 import org.bukkit.ChatColor;
@@ -24,7 +22,7 @@ public class ActionBarAction extends ShowAction {
         for (Player player : nearPlayers) {
             if (player == null) continue;
             if (Show.offset(player.getLocation(), show.getLocation()) < show.getRadius()) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
+                player.sendActionBar(text);
             }
         }
     }
