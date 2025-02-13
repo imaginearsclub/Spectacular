@@ -18,6 +18,9 @@ public abstract class ShowAction {
         this.time = time;
     }
 
+    public ShowAction(Show show, long time, Object o, Object o1) {
+    }
+
     public abstract void play(Player[] nearPlayers);
 
     public abstract ShowAction load(String line, String... args) throws ShowParseException;
